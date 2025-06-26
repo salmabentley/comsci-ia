@@ -1,0 +1,32 @@
+body {
+    background-color: #170024;
+    color: white;
+    font-family: "Inter";
+    text-align: center;
+}
+
+main {
+    display: flex;  
+    align-items: center;
+    justify-content: center;
+}
+
+#top, .labels, .stock-container {
+    display: flex;
+    width: 80vw;
+}
+
+.stock-container {
+    background-color: darkgray;
+    margin: 2%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stock-container h4{
+    margin: 2%
+}
+
+
+
