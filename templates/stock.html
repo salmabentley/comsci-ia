@@ -10,37 +10,50 @@
     <script src="/static/stock.js"></script>
     <title>Stock</title>
 </head>
-<body>
-    <div id="main">
-        <div id="top">
-            <input type="text">
-            <button id="enter">Enter</button>
-            <button id="add">Add +</button>
-            <button id="new-item" >New Item</button>
-            <button id="new-stock">Stock</button>
-        </div>
-        <div class="labels">
-            <h4>Name<i></i></h4>
-            <h4>Category<i></i></h4>
-            <h4>Stock Level<i></i></h4>
-            <div class="dropdown">
-                <ul>
-                    <li>None</li>
-                    <li>T-Shirts</li>
-                    <li>Accessories</li>
-                    <li>Hoodies & Sweaters</li>
-                    <li>Miscellaneous</li>
-                </ul>
+<body style="margin: 0;">
+    
+    <div id="overlay" onclick="popupClose()"></div>
+    <main>
+        <div id="main">
+            <div id="top">
+                <input type="text" placeholder="Search">
+                <button id="enter">Enter</button>
+                    <button id="add" onclick="popupAdd()">Add +</button>
+                    <div id="popupButtons">
+                        <button id="new-item" onclick="newItem()">New Item</button>
+                        <button id="new-stock" onclick="newStock()">New Stock</button>
+                    </div>
             </div>
+            <div class="labels">
+                <h4 style="
+                    width: 45%;
+                    ">Name<i></i></h4>
+                <h4 style="
+                    width: 35%;
+                    ">Category<i></i></h4>
+                <h4 style="
+                    width: 20%;
+                    "
+                >Stock Level<i></i></h4>
+                <div class="dropdown">
+                    <ul>
+                        <li>None</li>
+                        <li>T-Shirts</li>
+                        <li>Accessories</li>
+                        <li>Hoodies & Sweaters</li>
+                        <li>Miscellaneous</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="stock">
+                <!-- JAVASCRIPT WILL DYNAMICALLY RENDER INDIVIDUAL STOCK -->
+            </div>
+            
+    
         </div>
-        <div id="stock">
+    </main>
 
-        </div>
-        
-
-    </div>
-
-    <div class="popup">
+    <div id="popup">
         <form onsubmit="addItem(event)">
             <label>Name</label>
             <input type="text" id="name"><br>

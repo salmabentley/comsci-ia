@@ -20,10 +20,13 @@ function render_stock() {
         const stockContainer = document.createElement('div')
         stockContainer.className = 'stock-container'
         const name = document.createElement('h4');
+        name.className = 'stock-name';
         name.textContent = s.name;
         const category = document.createElement('h4');
+        name.className = 'stock-category';
         category.textContent = s.category;
         const quantity = document.createElement('h4');
+        name.className = 'stock-quantity';
         quantity.textContent = s.quantity;
     
         stockContainer.appendChild(name);
@@ -65,5 +68,31 @@ async function addItem(event) {
 
 window.onload = () => {
     fetch_stock();
+}
 
+let active = null;
+
+function popupAdd() {
+    var overlay = document.getElementById('overlay');
+    var buttons = document.getElementById('popupButtons');
+
+    active = buttons;
+    overlay.style.display = 'block'
+    buttons.style.display = 'flex';
+}
+
+function popupClose() {
+    var overlay = document.getElementById('overlay');
+
+    active.style.display = 'none';
+    overlay.style.display = 'none';
+
+    active = null;
+}
+
+function newItem() {
+    var popup = document.getElementById("popup");
+    active.style.display = 'none';
+    active = popup
+    popup.style.display = "block";
 }
