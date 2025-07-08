@@ -23,10 +23,10 @@ function render_stock() {
         name.className = 'stock-name';
         name.textContent = s.name;
         const category = document.createElement('h4');
-        name.className = 'stock-category';
+        category.className = 'stock-category';
         category.textContent = s.category;
         const quantity = document.createElement('h4');
-        name.className = 'stock-quantity';
+        quantity.className = 'stock-quantity';
         quantity.textContent = s.quantity;
     
         stockContainer.appendChild(name);
@@ -73,16 +73,28 @@ window.onload = () => {
 let active = null;
 
 function popupAdd() {
-    var overlay = document.getElementById('overlay');
-    var buttons = document.getElementById('popupButtons');
+    const overlay = document.getElementById('overlay');
+    const buttons = document.getElementById('popupButtons');
+    const add = document.getElementById('add');
 
     active = buttons;
     overlay.style.display = 'block'
     buttons.style.display = 'flex';
+    add.textContent = 'Cancel -';
+    add.style.zIndex = 5;
+    add.onclick = popupClose;
+    add.id = 'cancel';
 }
 
 function popupClose() {
-    var overlay = document.getElementById('overlay');
+    const overlay = document.getElementById('overlay');
+    const cancel = document.getElementById('cancel');
+    if (cancel !== null) {
+        cancel.textContent = "Add +";
+        cancel.style.zIndex = 1;
+        cancel.onclick = popupAdd;
+        cancel.id ='add';
+    }
 
     active.style.display = 'none';
     overlay.style.display = 'none';

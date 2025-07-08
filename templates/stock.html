@@ -8,9 +8,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <script src="/static/stock.js"></script>
+    <script src="{{ url_for('static', filename='components/nav.js') }}" defer></script>
     <title>Stock</title>
 </head>
 <body style="margin: 0;">
+    <nav-bar></nav-bar>
     
     <div id="overlay" onclick="popupClose()"></div>
     <main>
@@ -26,13 +28,13 @@
             </div>
             <div class="labels">
                 <h4 style="
-                    width: 45%;
+                    width: 40%;
                     ">Name<i></i></h4>
                 <h4 style="
-                    width: 35%;
+                    width: 45%;
                     ">Category<i></i></h4>
                 <h4 style="
-                    width: 20%;
+                    width: 15%;
                     "
                 >Stock Level<i></i></h4>
                 <div class="dropdown">
@@ -48,7 +50,6 @@
             <div id="stock">
                 <!-- JAVASCRIPT WILL DYNAMICALLY RENDER INDIVIDUAL STOCK -->
             </div>
-            
     
         </div>
     </main>
