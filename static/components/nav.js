@@ -5,18 +5,6 @@ class Nav extends HTMLElement {
 
     connectedCallback() {
         this.innerHTML = `
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const nav = document.getElementById('links');
-                        const links = nav.getElementsByTagName('a');
-                
-                        for (var link of links) {
-                            if (link.href == window.location.href) {
-                                link.className = 'active';
-                            }
-                        }
-                    })
-                </script>
                 <style>
                     nav {
                         width: 100%;
@@ -67,6 +55,16 @@ class Nav extends HTMLElement {
                     </div>
                 </nav>
         `
+        document.addEventListener('DOMContentLoaded', () => {
+            const nav = document.getElementById('links');
+            const links = nav.getElementsByTagName('a');
+
+            for (var link of links) {
+                if (link.href == window.location.href) {
+                    link.className = 'active';
+                }
+            }
+        })
     }
 }
 

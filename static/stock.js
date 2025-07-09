@@ -1,4 +1,6 @@
 let stock = [];
+let categories = ['Accessories', 'Shirts', 'Hoodies & Sweaters', 'Pants', 'Miscellaneous'];
+
 
 async function fetch_stock() {
     await fetch('/get-stock')
@@ -12,22 +14,34 @@ async function fetch_stock() {
     render_stock();
 }
 
+
+
 function render_stock() {
     const target = document.getElementById('stock');
     target.innerHTML = null;
-    stock.forEach((s) => {
+    stock.reverse().forEach((s) => {
 
         const stockContainer = document.createElement('div')
         stockContainer.className = 'stock-container'
+
         const name = document.createElement('h4');
         name.className = 'stock-name';
         name.textContent = s.name;
+
         const category = document.createElement('h4');
         category.className = 'stock-category';
         category.textContent = s.category;
+
         const quantity = document.createElement('h4');
         quantity.className = 'stock-quantity';
         quantity.textContent = s.quantity;
+        if (s.quantity >= 50) {
+            quantity.style.color = "#009E35";
+        } else if (s.quantity >= 15) {
+            quantity.style.color = "#CF5C09";
+        } else {
+            quantity.style.color = "#CF0909";
+        }
     
         stockContainer.appendChild(name);
         stockContainer.appendChild(category);
@@ -41,9 +55,8 @@ async function addItem(event) {
     event.preventDefault();
 
     let name_input = document.getElementById('name').value;
-    console.log(name_input);
     let category_input = document.getElementById('category').value;
-    let quantity_input = document.getElementById('quantity').value;
+    let quantity_input = document.getElementById('input-value').value;
 
     await fetch('/stock', {
         method: 'POST',
@@ -63,6 +76,7 @@ async function addItem(event) {
         category: category_input,
         quantity: quantity_input
     })
+    popupClose();
     render_stock();
 };
 
@@ -107,4 +121,19 @@ function newItem() {
     active.style.display = 'none';
     active = popup
     popup.style.display = "block";
+    if (cancel !== null) {
+        cancel.textContent = "Add +";
+        cancel.style.zIndex = 1;
+        cancel.onclick = popupAdd;
+        cancel.id ='add';
+    }
+    const value = document.getElementById("input-value");
+    const input = document.getElementById("quantity-input");
+    value.value = input.value;
+    input.addEventListener("input", (event) => {
+        value.value = event.target.value;
+    });
+    value.addEventListener("input", (event) => {
+        input.value = event.target.value;
+    });
 }
