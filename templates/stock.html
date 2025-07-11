@@ -18,8 +18,8 @@
     <main>
         <div id="main">
             <div id="top">
-                <input type="text" placeholder="Search">
-                <button id="enter">Enter</button>
+                <input type="text" placeholder="Search" id="search" >
+                <button id="enter" onclick="enter()">Enter</button>
                 <button id="add" onclick="popupAdd()">Add +</button>
                 <div id="popupButtons">
                     <button id="new-item" onclick="newItem()">New Item</button>
@@ -29,34 +29,42 @@
             <div class="labels">
                 <h4 style="
                     width: 40%;
-                    ">Name<i></i></h4>
-                <h4 style="
-                    width: 45%;
-                    ">Category<i></i></h4>
+                    "
+                    onclick="filter_name()"
+                    >Name</h4>
+                    <div class="dropdown-wrapper">
+                        <h4 id="category-label" style="margin: 0 0 2% 0;">
+                            Category <span class="down-arrow">▼</span>
+                        </h4>
+                        <div class="dropdown">
+                            <ul>
+                                <li onclick="filter_category(event)">None</li>
+                                <li onclick="filter_category(event)">T-Shirts</li>
+                                <li onclick="filter_category(event)">Accessories</li>
+                                <li onclick="filter_category(event)">Hoodies & Sweaters</li>
+                                <li onclick="filter_category(event)" style="border: none;">Miscellaneous</li>
+                            </ul>
+                        </div>
+                    </div>
+
+
                 <h4 style="
                     width: 15%;
                     "
+                onclick="filter_level()"
                 >Stock Level<i></i></h4>
-                <div class="dropdown">
-                    <ul>
-                        <li>None</li>
-                        <li>T-Shirts</li>
-                        <li>Accessories</li>
-                        <li>Hoodies & Sweaters</li>
-                        <li>Miscellaneous</li>
-                    </ul>
-                </div>
             </div>
             <div id="stock">
                 <!-- JAVASCRIPT WILL DYNAMICALLY RENDER INDIVIDUAL STOCK -->
             </div>
             <div id="popup">
                 <form onsubmit="addItem(event)">
+                    <i onclick="popupClose()">x</i>
                     <h1>New Item</h1> <br>
                     <label>Name</label> <br> <br>
-                    <input type="text" id="name" placeholder="Enter name of new product"><br> <br>
+                    <input type="text" id="name" placeholder="Enter name of new product" style="border: 2px solid red;"><br> <br>
                     <label>Category</label> <br> <br>
-                    <input list="categories" type="text" id="category" placeholder="Select category of new product"><br> <br>
+                    <input list="categories" type="text" id="category" placeholder="Select category of new product" style="border: 2px solid red;"><br> <br>
                     <datalist id="categories">
                         <option value="Accessories"></option>
                         <option value="Shirts"></option>
@@ -67,7 +75,7 @@
                     <label>Quantity</label> <br><br>
                     <input type="range" id="quantity-input" min=1 max=100 step=1 value=1><br>
                     <input type="number" id="input-value"></input><br><br>
-                    <input type="submit" >
+                    <input type="submit" id="submit" disabled>
                 </form>
             </div>
         </div>

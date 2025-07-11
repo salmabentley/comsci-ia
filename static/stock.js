@@ -1,4 +1,5 @@
 let stock = [];
+let filtered_stock = [];
 let categories = ['Accessories', 'Shirts', 'Hoodies & Sweaters', 'Pants', 'Miscellaneous'];
 
 
@@ -11,6 +12,7 @@ async function fetch_stock() {
     .catch(error => {
         console.error('Error:', error)
     });
+    filtered_stock = stock;
     render_stock();
 }
 
@@ -19,7 +21,7 @@ async function fetch_stock() {
 function render_stock() {
     const target = document.getElementById('stock');
     target.innerHTML = null;
-    stock.reverse().forEach((s) => {
+    filtered_stock.reverse().forEach((s) => {
 
         const stockContainer = document.createElement('div')
         stockContainer.className = 'stock-container'
@@ -82,6 +84,12 @@ async function addItem(event) {
 
 window.onload = () => {
     fetch_stock();
+    const search = document.getElementById('search');
+
+    search.addEventListener('keypress', (e) => {
+        e.preventDefault;
+        enter();
+    })
 }
 
 let active = null;
@@ -127,6 +135,46 @@ function newItem() {
         cancel.onclick = popupAdd;
         cancel.id ='add';
     }
+    const name = document.getElementById('name');
+    const category = document.getElementById('category');
+    const submit = document.getElementById('submit');
+    submit.disabled = true;
+
+    let name_status = false;
+    let category_status = false;
+
+    name.addEventListener('input', (e) => {
+        if (e.target.value.trim() !== '') {
+            name.style.border = 'none';
+            name_status = true;
+        } else {
+            name.style.border = '2px solid red'; 
+            name_status = false;
+        }
+        checkInputs();
+    });
+
+    category.addEventListener('input', (e) => {
+        if (categories.includes(e.target.value.trim())) {
+            category.style.border = 'none';
+            category_status = true;
+        } else {
+            category.style.border = '2px solid red'; 
+            category_status = false;
+        }
+        checkInputs();
+    });
+
+    function checkInputs() {
+        if (name_status && category_status) {
+            submit.disabled = false;
+        } else {
+            submit.disabled = true;
+        }
+    }
+
+
+    // quantity logic
     const value = document.getElementById("input-value");
     const input = document.getElementById("quantity-input");
     value.value = input.value;
@@ -137,3 +185,59 @@ function newItem() {
         input.value = event.target.value;
     });
 }
+
+function enter() {
+    const input = document.getElementById('search');
+    let query = input.value;
+    filtered_stock = [];
+
+    stock.forEach((s) => {
+        if (s.name.includes(query)) {filtered_stock.push(s)}
+    });
+
+    render_stock();
+}
+
+function filter_category(event) {
+    event.preventDefault;
+    let category = event.target.textContent;
+
+    filtered_stock=[];
+
+    if (category == 'None') {filtered_stock = stock}
+    else {
+        stock.forEach((s) => {
+            if (s.category == category) {filtered_stock.push(s)}
+        })
+    }
+
+    render_stock();
+}
+
+// false is descending true is ascending
+let toggle_level = false;
+
+function filter_level() {
+    toggle_level = !toggle_level;
+
+    if (toggle_level) {
+        filtered_stock.sort((a,b) => b.quantity - a.quantity);
+    } else {
+        filtered_stock.sort((a,b) => a.quantity - b.quantity);
+    }
+    render_stock();
+}
+
+let toggle_name = false;
+
+function filter_name() {
+    toggle_name = !toggle_name;
+
+    if (toggle_name) {
+        filtered_stock.sort((a,b) => b.name.localeCompare(a.name));
+    } else {
+        filtered_stock.sort((a,b) => a.name.localeCompare(b.name));
+    }
+    render_stock();
+}
+
