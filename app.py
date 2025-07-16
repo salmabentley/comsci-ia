@@ -96,6 +96,19 @@ def get_stock():
     ]
     return jsonify(stock_data)
 
+@app.route('/update-stock', methods=['PATCH'])
+def update_stock():
+    data = request.json
+    for d in data:
+        item = db.session.execute(db.select(Stock).filter_by(name=d['name'])).scalar_one_or_none()
+
+        if item:
+            item.quantity += int(d['quantity'])
+    db.session.commit()
+
+    return render_template('stock.html')
+
+
 
 if __name__ == '__main__':
     # with app.app_context():

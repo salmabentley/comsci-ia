@@ -82,16 +82,6 @@ async function addItem(event) {
     render_stock();
 };
 
-window.onload = () => {
-    fetch_stock();
-    const search = document.getElementById('search');
-
-    search.addEventListener('keypress', (e) => {
-        e.preventDefault;
-        enter();
-    })
-}
-
 let active = null;
 
 function popupAdd() {
@@ -192,7 +182,7 @@ function enter() {
     filtered_stock = [];
 
     stock.forEach((s) => {
-        if (s.name.includes(query)) {filtered_stock.push(s)}
+        if (s.name.toLowerCase().includes(query)) {filtered_stock.push(s)}
     });
 
     render_stock();
@@ -218,12 +208,17 @@ function filter_category(event) {
 let toggle_level = false;
 
 function filter_level() {
+    const arrow = document.getElementById("stock-arrow");
+
     toggle_level = !toggle_level;
 
     if (toggle_level) {
         filtered_stock.sort((a,b) => b.quantity - a.quantity);
+        arrow.textContent = "↑";
+
     } else {
         filtered_stock.sort((a,b) => a.quantity - b.quantity);
+        arrow.textContent = "↓";
     }
     render_stock();
 }
@@ -231,13 +226,146 @@ function filter_level() {
 let toggle_name = false;
 
 function filter_name() {
+    const arrow = document.getElementById("name-arrow");
     toggle_name = !toggle_name;
 
     if (toggle_name) {
         filtered_stock.sort((a,b) => b.name.localeCompare(a.name));
+        arrow.textContent = "↑";
     } else {
         filtered_stock.sort((a,b) => a.name.localeCompare(b.name));
+        arrow.textContent = "↓";
     }
     render_stock();
 }
 
+function add_dropdown_stock() {
+    const list = document.getElementById("all-stock");
+    const input = document.getElementById("popup-search");
+    stock.forEach((s) => {
+        let option = document.createElement("option");
+        option.value = s.name;
+        list.appendChild(option);
+    })
+}
+
+
+function push_stock() {
+    const input = document.getElementById("popup-search")
+    const item = input.value;
+    // const foundItem = stock.find(s=>s.name === item)
+    if (!stock.some(s => s.name === item)) {
+        input.style.border = "2px solid red";   
+        document.getElementById("error-text").textContent = 'Please enter a valid item';
+        input.value = '';
+    } else {
+        input.style.border = "none";
+        document.getElementById("error-text").textContent = '';
+
+        const container = document.createElement("div");
+        container.className = "new-stock";
+        const name = document.createElement("h4");
+        name.textContent = item;
+        const quantity = document.createElement("input");
+        quantity.type = 'number';
+        quantity.placeholder = 'Quantity'
+        quantity.min = 1;
+        const remove = document.createElement("i");
+        remove.className = 'material-icons';
+        remove.textContent = 'delete';
+        remove.style.color = 'red';
+        remove.style.cursor = 'pointer';
+        remove.onclick = remove_stock;
+
+        container.appendChild(name);
+        container.appendChild(quantity);
+        container.appendChild(remove);
+        document.getElementById("new-stock-container").appendChild(container);
+        input.value = '';
+    }
+}
+
+function remove_stock(event) {
+    event.preventDefault();
+    const parent = event.srcElement.parentElement;
+    parent.remove();
+
+
+}
+
+async function updateStock() {
+    const collections = document.getElementById("new-stock-container").children;
+    const unfilled = [];
+
+    const stock_updates = Array.from(collections).map((item) => {
+        const name = item.querySelector('h4').textContent;
+        const quantity = item.querySelector('input').value;
+
+        item.querySelector('input').style.border="none";
+
+        if (quantity < 0 || quantity == '') {
+            unfilled.push(item.querySelector('input'));
+        }
+
+        return {name, quantity}
+    })
+
+    if (unfilled.length !== 0) {
+        for (let i =0; i<unfilled.length; i++) {
+            unfilled[i].style.border = '2px solid red';
+        }
+        document.getElementById("error-text").textContent = 'Please enter a valid quantity';
+        return;
+    } else {
+        await fetch('/update-stock', {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(stock_updates)
+        }).then(() => {
+            //frontend update
+            for (let i=0; i<stock_updates.length;i++) {
+                const item = stock.find(s=>s.name == stock_updates[i].name);
+                item.quantity += Number(stock_updates[i].quantity);
+
+                document.getElementById("new-stock-container").innerHTML = '';
+            }
+            render_stock()
+        }).catch((e) => console.log('error: ' + e))
+    }
+
+
+
+    console.log(stock_updates);
+    console.log(unfilled);
+}
+
+function newStock() {
+    // const overlay = document.getElementById("overlay");
+    active.style.display = 'none';
+    const popup = document.getElementById("popup-stock")
+    popup.style.display = 'block';
+    active = popup;
+    if (cancel !== null) {
+        cancel.textContent = "Add +";
+        cancel.style.zIndex = 1;
+        cancel.onclick = popupAdd;
+        cancel.id ='add';
+    }
+}
+
+
+
+
+window.onload = async () => {
+    await fetch_stock();
+    const search = document.getElementById('search');
+
+    search.addEventListener('keypress', (e) => {
+        e.preventDefault;
+        enter();
+    });
+
+    add_dropdown_stock();
+}

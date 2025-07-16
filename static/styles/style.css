@@ -60,17 +60,17 @@ main {
     max-height: 40vh;
 }
 
-#stock::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 8px;
 }
 
-#stock::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background: rgba(107, 107, 107, 0.5);
     border-radius: 10px;
 
 }
 
-#stock::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: rgba(0,0,0,0.3);
     border-radius: 5px;
 }
@@ -172,7 +172,7 @@ button {
     position: absolute;
     display: none;
     z-index: 5;
-    bottom: calc(55% + 4vh);
+    bottom: calc(55% + 2vh);
     /* width: 17.5%; */
     margin: 0 2% 10% 2%;
     right: 0;
@@ -221,7 +221,7 @@ button {
     display: none;
 }
 
-#popup {
+#popup, #popup-stock {
     display: none;
     width: 50vw;
     height: fit-content;
@@ -310,5 +310,39 @@ button {
 
 .dropdown-wrapper:hover .dropdown {
     display: block;
+}
+
+#popup-stock {
+    z-index: 5;
+    background-color: rgba(0,0,0,0.9);
+    display: none;
+}
+
+#popup-stock button {
+    background-color: #2f2b6e;
+    padding: 2%;
+}
+
+#popup-stock p {
+    color: red;
+}
+
+#new-stock-container {
+    height: 30vh;
+    background-color: #48445f;
+    border-radius: 20px;
+    margin: 4% 0;
+    padding: 2% 10%;
+    overflow-y: scroll;
+}
+
+.new-stock {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.new-stock input {
+    width: 15%;
 }
 
