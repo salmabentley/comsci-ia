@@ -25,6 +25,8 @@ function render_stock() {
 
         const stockContainer = document.createElement('div')
         stockContainer.className = 'stock-container'
+        stockContainer.onclick = stockRedirect;
+        stockContainer.id = s.id;
 
         const name = document.createElement('h4');
         name.className = 'stock-name';
@@ -355,7 +357,12 @@ function newStock() {
     }
 }
 
+function stockRedirect(event) {
+    event.preventDefault;
+    const element = event.target.parentElement;
 
+    window.location.pathname = `/stock/${element.id}`;
+}
 
 
 window.onload = async () => {

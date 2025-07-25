@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="/static/stock.js"></script> -->
+
+    <script src="{{ url_for('static', filename='components/nav.js') }}" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/individual_stock.css') }}">
+
+    <title>Document</title>
+</head>
+<body>
+    <nav-bar></nav-bar>
+    <main>
+        <div class="container">
+            <h1>{{stock.name}}</h1>
+            <img src="" alt="">
+            <div class="stock-container">
+                <div id="header">
+                    <h4>Stock</h4>
+                    <button>Add</button>
+                </div>
+                <div id="stock-info">
+                    <div class="stock">
+                        <h2>{{stock.quantity}}</h2>
+                        <h4>Stock left</h4>
+                    </div>
+                    <div class="stock">
+                        <h2>{{stock.quantity}}</h2>
+                        <h4>Stock left</h4>
+                    </div>
+                </div>
+            </div>
+            <div id="order-container">
+                <div id="labels">
+                    <h4>ID</h4>
+                    <h4>Quantity</h4>
+                    <h4>Status</h4>
+                </div>
+                <div id="orders">
+    
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
