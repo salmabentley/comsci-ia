@@ -1,0 +1,15 @@
+body {
+    font-family: "Inter";
+
+}
+
+main {
+    /* background-color: #170024; */
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}

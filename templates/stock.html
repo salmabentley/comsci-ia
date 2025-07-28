@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -57,7 +57,7 @@
                 >Stock Level <span id="stock-arrow" style="cursor: pointer;">↓</span></h4>
             </div>
             <div id="stock">
-                <!-- JAVASCRIPT WILL DYNAMICALLY RENDER INDIVIDUAL STOCK -->
+                JAVASCRIPT WILL DYNAMICALLY RENDER INDIVIDUAL STOCK
             </div>
             <div id="popup">
                 <form onsubmit="addItem(event)">
@@ -108,4 +108,108 @@
 
     </main>
 </body>
-</html>
+</html> -->
+
+{% extends "boiler.html" %}
+
+{% block title %} Inventory {% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/stock.css') }}">
+    <script src="/static/stock.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div id="overlay" onclick="popupClose()"></div>
+    <main>
+        <div id="main">
+            <div id="top">
+                <input type="text" placeholder="Search" id="search" >
+                <button id="enter" onclick="enter()">Enter</button>
+                <button id="add" onclick="popupAdd()">Add +</button>
+                <div id="popupButtons">
+                    <button id="new-item" onclick="newItem()">New Item</button>
+                    <button id="new-stock" onclick="newStock()">New Stock</button>
+                </div>
+            </div>
+            <div class="labels">
+                <h4 style="
+                    width: 40%;
+                    "
+                    onclick="filter_name()"
+                    >Name <span id="name-arrow" style="cursor: pointer;">↓</span></h4>
+                    <div class="dropdown-wrapper">
+                        <h4 id="category-label" style="margin: 0 0 2% 0;">
+                            Category <span class="material-icons" style="vertical-align: middle;">keyboard_arrow_down</span>
+                        </h4>
+                        <div class="dropdown">
+                            <ul>
+                                <li onclick="filter_category(event)">None</li>
+                                <li onclick="filter_category(event)">T-Shirts</li>
+                                <li onclick="filter_category(event)">Accessories</li>
+                                <li onclick="filter_category(event)">Hoodies & Sweaters</li>
+                                <li onclick="filter_category(event)" style="border: none;">Miscellaneous</li>
+                            </ul>
+                        </div>
+                    </div>
+
+
+                <h4 style="
+                    width: 15%;
+                    "
+                onclick="filter_level()"
+                    
+                >Stock Level <span id="stock-arrow" style="cursor: pointer;">↓</span></h4>
+            </div>
+            <div id="stock">
+                JAVASCRIPT WILL DYNAMICALLY RENDER INDIVIDUAL STOCK
+            </div>
+            <div id="popup">
+                <form onsubmit="addItem(event)">
+                    <i class="material-icons" onclick="popupClose()">close</i>
+                    <h1>New Item</h1> <br>
+                    <label>Name</label> <br> <br>
+                    <input type="text" id="name" placeholder="Enter name of new product" style="border: 2px solid red;"><br> <br>
+                    <label>Category</label> <br> <br>
+                    <input list="categories" type="text" id="category" placeholder="Select category of new product" style="border: 2px solid red;"><br> <br>
+                    <datalist id="categories">
+                        <option value="Accessories"></option>
+                        <option value="Shirts"></option>
+                        <option value="Hoodies & Sweaters"></option>
+                        <option value="Pants"></option>
+                        <option value="Miscellaneous"></option>
+                    </datalist>
+                    <label>Quantity</label> <br><br>
+                    <input type="range" id="quantity-input" min=1 max=100 step=1 value=1><br>
+                    <input type="number" id="input-value"></input><br><br>
+                    <input type="submit" id="submit" disabled>
+                </form>
+            </div>
+
+            <div id="popup-stock">
+                <i class="material-icons" onclick="popupClose()" style="
+                        position: absolute;
+                        top: 4%;
+                        right: 4%;
+                        font-size: 1.2rem;
+                        cursor: pointer;
+                    "  >close</i>
+
+                <h1>New Stock</h1>
+                <div class="top">
+                    <input list="all-stock" type="text" name="popupsearch" id="popup-search" placeholder="Search for item">
+                    <button id="add-stock" onclick="push_stock()">Add +</button>
+                </div>
+                <datalist id="all-stock">
+
+                </datalist>
+                <p id="error-text"></p>
+                <div id="new-stock-container">
+
+                </div>
+                <button onclick="updateStock()">Save</button>
+            </div>
+        </div>
+
+    </main>
+{% endblock %}
