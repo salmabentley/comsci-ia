@@ -2,11 +2,23 @@ from flask import Flask, request, redirect, render_template, jsonify, json, url_
 from flask_sqlalchemy import SQLAlchemy
 import random
 import uuid
+import os
+from datetime import date
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
+
+#image checks
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # max 2MB
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 
 @app.cli.command('stock')
@@ -15,65 +27,83 @@ def show_stock_table():
     print(stock[0])
 
 
+
 class Users(db.Model):
-    __tablename__='users'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    password = db.Column(db.String(50))
-    
+    __tablename__ = 'users'
+    user_id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+
+    # orders = db.relationship('Orders', back_populates='user', cascade="all, delete-orphan")
+
     def __repr__(self):
-        return f'<Users "{self.name}">'
+        return f"<User {self.username}>"
+
+
+class Orders(db.Model):
+    __tablename__ = 'orders'
+    order_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    order_date = db.Column(db.Date, nullable=False, default=date.today)
+    status = db.Column(db.Boolean, nullable=False)
+
+    # user = db.relationship('Users', back_populates='orders')  
+    order_items = db.relationship('OrderStock', back_populates='order', cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Order {self.order_id}>"
+
 
 class Stock(db.Model):
-    __tablename__='stock'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    category = db.Column(db.String(50))
-    quantity = db.Column(db.Integer)
+    __tablename__ = 'stock'
+    stock_id = db.Column(db.String(50), primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    stock_level = db.Column(db.Integer, nullable=False)
+    image = db.Column(db.String(120), nullable=True)
+    # price = db.Column(db.Float, nullable=False)
 
-    # def get_name(self):
-    #     return self.name
-    
-    # def get_category(self):
-    #     return self.category
-    
-    # def get_quantity(self):
-    #     return self.quantity
-    
-    # def set_quantity(quantity, self):
-    #     self.quantity = quantity
+    order_items = db.relationship('OrderStock', back_populates='stock', cascade="all, delete-orphan")
+
     def __repr__(self):
-        return self.name
+        return f"<Stock {self.name}>"
 
-class Order(db.Model):
-    __tablename__ = 'orders'
-    id = db.Column(db.String(50), primary_key=True)
-    total = db.Column(db.Float)
-    status = db.Column(db.Boolean)
 
-    def get_id(self):
-        return self.id
-    
-    def get_total(self):
-        return self.total
-    
-    def get_status(self):
-        return self.status
-    
-    def set_status(status, self):
-        self.status = status
-    
+class OrderStock(db.Model):
+    __tablename__ = 'order_stock'
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), primary_key=True)
+    stock_id = db.Column(db.Integer, db.ForeignKey('stock.stock_id'), primary_key=True)
+    quantity = db.Column(db.Integer, nullable=False)
+
+    order = db.relationship('Orders', back_populates='order_items')
+    stock = db.relationship('Stock', back_populates='order_items')
+
+    def __repr__(self):
+        return f"<OrderStock Order:{self.order_id} Stock:{self.stock_id} Qty:{self.quantity}>"
+  
 
 @app.route("/stock", methods=['GET', 'POST'])
-def manage_stock():    
+def manage_stock():
     if request.method == 'POST':
-        item = json.loads(request.data)
+        name = request.form['name']
+        category = request.form['category']
+        quantity = request.form['quantity']
+
+        image_file = request.files.get('image')
+        image_filename = None
+        if image_file:
+            filename = f"{uuid.uuid4().hex}_{image_file.filename}"
+            upload_path = os.path.join('static', 'uploads', filename)
+            image_file.save(upload_path)
+            image_filename = filename
+
         try:
             new_stock = Stock(
-                id = random.randint(1,19999999),
-                name = item['name'],
-                category = item['category'],
-                quantity = item['quantity']
+                stock_id=uuid.uuid4().hex,  # Generate a unique stock ID
+                name=name,
+                category=category,
+                stock_level=int(quantity),
+                image=image_filename
             )
             db.session.add(new_stock)
             db.session.commit()
@@ -84,15 +114,16 @@ def manage_stock():
     else:
         return render_template('stock.html')
 
+
 @app.route('/get-stock')
 def get_stock():
     stock = Stock.query.all()
     stock_data = [
         {
-            'id': item.id,
+            'id': item.stock_id,
             'name': item.name,
             'category': item.category,
-            'quantity': item.quantity
+            'quantity': item.stock_level
         } for item in stock
     ]
     return jsonify(stock_data)
@@ -104,14 +135,14 @@ def update_stock():
         item = db.session.execute(db.select(Stock).filter_by(name=d['name'])).scalar_one_or_none()
 
         if item:
-            item.quantity += int(d['quantity'])
+            item.stock_level += int(d['quantity'])
     db.session.commit()
 
     return render_template('stock.html')
 
-@app.route('/stock/<id>')
-def individual_stock(id):
-    stock = db.session.execute(db.select(Stock).filter_by(id=id)).scalar_one_or_none()
+@app.route('/stock/<stock_id>')
+def individual_stock(stock_id):
+    stock = db.session.execute(db.select(Stock).filter_by(stock_id=stock_id)).scalar_one_or_none()
     return render_template('individual_stock.html', stock=stock)
 
 

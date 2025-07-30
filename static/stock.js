@@ -62,13 +62,20 @@ async function addItem(event) {
     let category_input = document.getElementById('category').value;
     let quantity_input = document.getElementById('input-value').value;
 
+    const fd = new FormData();
+    fd.append('name', name_input);
+    fd.append('category', category_input);  
+    fd.append('quantity', quantity_input);
+    const image = document.getElementById('image').files[0];
+    if (image) {
+        fd.append('image', image);
+    } else {
+        fd.append('image', null);
+    }
+
     await fetch('/stock', {
         method: 'POST',
-        body: JSON.stringify({
-            name: name_input,
-            category: category_input,
-            quantity: quantity_input
-        })
+        body: fd
     }).then(() => {
         console.log('success');
     }).catch((err) => {

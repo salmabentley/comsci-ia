@@ -162,7 +162,7 @@
                 >Stock Level <span id="stock-arrow" style="cursor: pointer;">↓</span></h4>
             </div>
             <div id="stock">
-                JAVASCRIPT WILL DYNAMICALLY RENDER INDIVIDUAL STOCK
+                <!-- JAVASCRIPT WILL DYNAMICALLY RENDER INDIVIDUAL STOCK -->
             </div>
             <div id="popup">
                 <form onsubmit="addItem(event)">
@@ -179,7 +179,9 @@
                         <option value="Pants"></option>
                         <option value="Miscellaneous"></option>
                     </datalist>
-                    <label>Quantity</label> <br><br>
+                    <label>Item Image</label><br><br>
+                    <input type="file" id="image" accept="image/*" style="display: block; margin: 10px 0;"><br><br>
+                    <label>Stock Level</label> <br><br>
                     <input type="range" id="quantity-input" min=1 max=100 step=1 value=1><br>
                     <input type="number" id="input-value"></input><br><br>
                     <input type="submit" id="submit" disabled>

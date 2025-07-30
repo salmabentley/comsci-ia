@@ -21,8 +21,9 @@ main {
     flex-direction: column;
     /* align-items: center; */
     justify-content: center;
-    width: 40vw;
-    margin: 2%;
+    width: 35vw;
+    margin: 1%;
+    text-align: center;
     
 }
 
@@ -101,4 +102,18 @@ button:hover {
 
 #popup-stock p {
     color: red;
+}
+
+#labels {
+    border-bottom: 2px solid white;
+}
+
+#order-container {
+    padding: 3%;
+}
+
+img {
+    align-self: center;
+    width: 40%;
+    margin-bottom: 10%;
 }
