@@ -82,6 +82,11 @@ class OrderStock(db.Model):
         return f"<OrderStock Order:{self.order_id} Stock:{self.stock_id} Qty:{self.quantity}>"
   
 
+@app.route('/orders', methods=['GET', 'POST'])
+def manage_orders():
+    return render_template('order.html')
+
+
 @app.route("/stock", methods=['GET', 'POST'])
 def manage_stock():
     if request.method == 'POST':

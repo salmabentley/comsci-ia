@@ -31,11 +31,11 @@ class Nav extends HTMLElement {
                         align-items: center;
                         justify-content: center;
                         float: right;
-                        width: 30%;
+                        width: 40%;
                     }
                     nav div a {
                         text-decoration: none;
-                        margin: 0 5%;
+                        margin: 0 3%;
                         color: white;
                         transition: 0.2s;
                     }
@@ -50,6 +50,7 @@ class Nav extends HTMLElement {
                     <div id="links">
                         <a href="/">Dashboard</a>
                         <a href="/stock">Stock</a>
+                        <a href="/orders">Orders</a>
                         <a href="/analytics">Analytics</a>
                         <a href="/login">Logout</a>
                     </div>
