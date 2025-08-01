@@ -1,0 +1,64 @@
+let toggle = false;
+
+function popup() {
+    const input = document.getElementById("quantity");
+    if (input.hidden) {
+        input.hidden = false;
+        toggle = true;
+    }
+    else {
+        input.hidden = true;
+        toggle = false;
+    }
+
+    const overlay = document.getElementById("overlay");
+    if (toggle) {
+        overlay.style.display = "block";
+    } else {
+        overlay.style.display = "none";
+    }
+
+
+    const add = document.getElementById("add");
+    if (toggle) {
+        add.id = 'submit';
+        add.textContent = "Submit";
+        add.onclick = async () => {
+            if (!input.value) {
+                input.style.border = "2px solid red";
+            } else {
+                await fetch('/update-stock', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: document.getElementById("name").textContent,
+                        quantity: input.value
+                    })
+                }).then(
+                    res => {
+                        if(res.ok) {
+                            popupClose();
+                            console.log("success");
+                            window.location.reload();
+                        }
+                    }
+                ).catch(err => console.log(err))
+            }
+        }
+    }
+}
+
+function popupClose() {
+    const input = document.getElementById("quantity");
+    input.hidden = true;
+    toggle = false;
+    const add = document.getElementById("submit");
+    add.id = "add";
+    add.textContent = "Add";
+    add.onclick = popup;
+
+    const overlay = document.getElementById("overlay");
+    overlay.style.display = "none";
+}

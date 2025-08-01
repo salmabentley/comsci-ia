@@ -131,11 +131,17 @@ def get_stock():
 @app.route('/update-stock', methods=['PATCH'])
 def update_stock():
     data = request.json
-    for d in data:
-        item = db.session.execute(db.select(Stock).filter_by(name=d['name'])).scalar_one_or_none()
+    print(data)
+    if isinstance(data, list):
+        for d in data:
+            item = db.session.execute(db.select(Stock).filter_by(name=d['name'])).scalar_one_or_none()
 
+            if item:
+                item.stock_level += int(d['quantity'])
+    else:
+        item = db.session.execute(db.select(Stock).filter_by(name=data['name'])).scalar_one_or_none()
         if item:
-            item.stock_level += int(d['quantity'])
+            item.stock_level += int(data['quantity'])
     db.session.commit()
 
     return render_template('stock.html')

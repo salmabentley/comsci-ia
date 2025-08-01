@@ -21,6 +21,12 @@ async function fetch_stock() {
 function render_stock() {
     const target = document.getElementById('stock');
     target.innerHTML = null;
+    if (filtered_stock.length === 0) {
+        const noStock = document.createElement('h3');
+        noStock.textContent = 'No stock found';
+        target.appendChild(noStock);
+        return;
+    }
     filtered_stock.reverse().forEach((s) => {
 
         const stockContainer = document.createElement('div')

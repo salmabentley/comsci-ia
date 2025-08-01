@@ -5,7 +5,7 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/individual_stock.css') }}">
-    <!-- <script src="/static/stock.js"></script> -->
+    <script src="/static/individual_stock.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
     <main>
         <div class="container">
             <div id="left">
-                <h1 style="text-align: left;">{{stock.name}}</h1>
+                <h1 style="text-align: left;" id="name">{{stock.name}}</h1>
                 {% if stock.image == None %}
                     <img src="{{url_for('static', filename='/uploads/placeholder.svg')}}" alt="">
                 {% else %}
@@ -23,7 +23,12 @@
                 <div id="stock-container">
                     <div id="header">
                         <h3>Stock</h3>
-                        <button>Add</button>
+                        <div id="popup-container">
+                            <div id="popup">
+                                <input type="number" id="quantity" placeholder="Quantity" hidden>
+                            </div>
+                            <button onclick="popup()" id="add">Add</button>
+                        </div>
                     </div>
                     <div id="stock-info">
                         <div class="stock">
@@ -49,28 +54,6 @@
                 </div>
             </div>
         </div>
-        <div id="popup-stock">
-            <i class="material-icons" onclick="popupClose()" style="
-                    position: absolute;
-                    top: 4%;
-                    right: 4%;
-                    font-size: 1.2rem;
-                    cursor: pointer;
-                "  >close</i>
 
-            <h1>New Stock</h1>
-            <div class="top">
-                <input list="all-stock" type="text" name="popupsearch" id="popup-search" placeholder="Search for item">
-                <button id="add-stock" onclick="push_stock()">Add +</button>
-            </div>
-            <datalist id="all-stock">
-
-            </datalist>
-            <p id="error-text"></p>
-            <div id="new-stock-container">
-
-            </div>
-            <button onclick="updateStock()">Save</button>
-        </div>
     </main>
 {% endblock %}

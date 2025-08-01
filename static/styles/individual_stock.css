@@ -51,58 +51,44 @@ main {
     height: fit-content;
 }
 
+#add {
+    background-color: #3B209E;
+}
+
 button {
-    width: 15%;
-    padding: 2%;
+    position: relative;
+    text-align: center;
+    padding: 10px 20px;
     border-radius: 20px;
     border: none;
     color: white;
-    background-color: #3B209E;
     transition: 0.3s;
+    z-index: 5;
     cursor: pointer;
+    width: auto; /* or remove this line */
 }
 
-button:hover {
+#submit {
+    background-color: rgb(34, 54, 165);
+}
+
+input {
+    width:6vw;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #f0f0f0;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 5vh;
+    z-index:5;
+}
+
+#add:hover {
     background-color: #2c1779;
 }
 
-#overlay {
-    position: absolute;
-    top: 0;
-    z-index: 4;
-    background-color: rgba(0,0,0,0.5);
-    width: 100vw;
-    height: 100vh;
-    cursor: pointer;
-    display: none;
-}
-
-#popup, #popup-stock {
-    display: none;
-    width: 50vw;
-    height: fit-content;
-    background-color: #48445f;
-    position: fixed;
-    z-index: 5;
-    padding: 4% 2%;
-    border-radius: 20px;
-    box-shadow: 1px 1px 20px 10px rgba(15, 1, 53, 0.6);
-}
-
-#popup-stock {
-    z-index: 5;
-    background-color: rgba(0,0,0,0.9);
-    display: none;
-}
-
-#popup-stock button {
-    background-color: #2f2b6e;
-    padding: 2%;
-}
-
-#popup-stock p {
-    color: red;
-}
 
 #labels {
     border-bottom: 2px solid white;
@@ -116,4 +102,26 @@ img {
     align-self: center;
     width: 40%;
     margin-bottom: 10%;
+}
+
+#popup-container {
+    position: relative;
+    width: max-content;
+    /* padding: 5%; */
+    /* background-color: #0A001D; */
+}
+
+#popup {
+    width: fit-content;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    z-index: 4;
+    background-color: rgba(0,0,0,0.5);
+    width: 100vw;
+    height: 100vh;
+    cursor: pointer;
+    display: none;
 }
