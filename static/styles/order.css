@@ -48,3 +48,88 @@ h1 {
     background: rgba(116,142,189,0.2);
     border-radius: 20px;
 }
+
+.completed {
+    background: #009E35;
+}
+
+.pending {
+    background: #CF0909;
+}
+
+.status {
+    color: white;
+    border: none;
+    padding: 1% 2%;
+    border-radius: 10px;
+    width: 7vw;
+}
+
+main {
+    flex-direction: column;
+}
+
+#containers{
+    width: 100%;
+    display: flex;
+    
+}
+
+#top {
+    width: 90vw;
+    display: flex;
+    justify-content: right;
+    gap: 5%;
+    align-items: center;
+    /* padding: 0 10%; */
+}
+
+#save {
+    background: #057035;
+    color: white;
+    width: 10%;
+    border: none;
+    border-radius: 10px;
+    height: 60%;
+    cursor: pointer;
+    transition: 0.2s;
+    height: 5vh;
+}
+
+#save:hover {
+    background: #034621;
+}
+
+#save:disabled {
+    background: #034621;
+    color: rgb(129, 128, 128);
+}
+
+#popup {
+    /* display: none; */
+    width: 50vw;
+    height: fit-content;
+    background-color: #384861;
+    position: fixed;
+    z-index: 5;
+    padding: 4% 2%;
+    border-radius: 20px;
+    box-shadow: 1px 1px 20px 10px rgba(15, 1, 53, 0.6);
+}
+.stock {
+    padding: 0 4%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stock input {
+    width: 7%;
+}
+
+.stock p {
+    max-width: 10%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}

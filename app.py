@@ -43,9 +43,11 @@ class Users(db.Model):
 class Orders(db.Model):
     __tablename__ = 'orders'
     order_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    # user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     order_date = db.Column(db.Date, nullable=False, default=date.today)
     status = db.Column(db.Boolean, nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    
 
     # user = db.relationship('Users', back_populates='orders')  
     order_items = db.relationship('OrderStock', back_populates='order', cascade="all, delete-orphan")
@@ -61,7 +63,7 @@ class Stock(db.Model):
     category = db.Column(db.String(50), nullable=False)
     stock_level = db.Column(db.Integer, nullable=False)
     image = db.Column(db.String(120), nullable=True)
-    # price = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Float, nullable=False)
 
     order_items = db.relationship('OrderStock', back_populates='stock', cascade="all, delete-orphan")
 
@@ -84,7 +86,18 @@ class OrderStock(db.Model):
 
 @app.route('/orders', methods=['GET', 'POST'])
 def manage_orders():
-    return render_template('order.html')
+    stock = Stock.query.all()
+    stock_data = [
+        {
+            'stock_id': item.stock_id,
+            'name': item.name,
+            'category': item.category,
+            'quantity': item.stock_level,
+            'price': item.price,
+            'image': item.image
+        } for item in stock
+    ]
+    return render_template('order.html', stock=stock_data)
 
 
 @app.route("/stock", methods=['GET', 'POST'])
@@ -92,6 +105,7 @@ def manage_stock():
     if request.method == 'POST':
         name = request.form['name']
         category = request.form['category']
+        price = request.form['price']
         quantity = request.form['quantity']
 
         image_file = request.files.get('image')
@@ -107,6 +121,7 @@ def manage_stock():
                 stock_id=uuid.uuid4().hex,  # Generate a unique stock ID
                 name=name,
                 category=category,
+                price=float(price),
                 stock_level=int(quantity),
                 image=image_filename
             )

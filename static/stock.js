@@ -66,11 +66,13 @@ async function addItem(event) {
 
     let name_input = document.getElementById('name').value;
     let category_input = document.getElementById('category').value;
+    let price_input = document.getElementById('price').value;
     let quantity_input = document.getElementById('input-value').value;
 
     const fd = new FormData();
     fd.append('name', name_input);
     fd.append('category', category_input);  
+    fd.append('price', price_input);  
     fd.append('quantity', quantity_input);
     const image = document.getElementById('image').files[0];
     if (image) {
@@ -142,11 +144,13 @@ function newItem() {
     }
     const name = document.getElementById('name');
     const category = document.getElementById('category');
+    const price = document.getElementById('price')
     const submit = document.getElementById('submit');
     submit.disabled = true;
 
     let name_status = false;
     let category_status = false;
+    let price_status = false;
 
     name.addEventListener('input', (e) => {
         if (e.target.value.trim() !== '') {
@@ -170,8 +174,20 @@ function newItem() {
         checkInputs();
     });
 
+    price.addEventListener('input', (e) => {
+        if (e.target.value.trim() != null) {
+            price.style.border = 'none';
+            price_status = true;
+        } else {
+            price.style.border = '2px solid red'; 
+            price_status = false;
+        }
+        checkInputs();
+    });
+    
+
     function checkInputs() {
-        if (name_status && category_status) {
+        if (name_status && category_status && price_status) {
             submit.disabled = false;
         } else {
             submit.disabled = true;
