@@ -86,18 +86,55 @@ class OrderStock(db.Model):
 
 @app.route('/orders', methods=['GET', 'POST'])
 def manage_orders():
-    stock = Stock.query.all()
-    stock_data = [
-        {
-            'stock_id': item.stock_id,
-            'name': item.name,
-            'category': item.category,
-            'quantity': item.stock_level,
-            'price': item.price,
-            'image': item.image
-        } for item in stock
-    ]
-    return render_template('order.html', stock=stock_data)
+    if request.method == 'GET':
+        stock = Stock.query.all()
+        stock_data = [
+            {
+                'stock_id': item.stock_id,
+                'name': item.name,
+                'category': item.category,
+                'quantity': item.stock_level,
+                'price': item.price,
+                'image': item.image
+            } for item in stock
+        ]
+        return render_template('order.html', stock=stock_data)
+
+    elif request.method == 'POST':
+        data = request.json
+
+        # Generate or use provided order_id
+        order_id = data['id'] if data['id'] != '' else uuid.uuid4().int >> 64  # short int from UUID
+
+        # Create the Order object
+        new_order = Orders(
+            order_id=order_id,
+            order_date=data.get('date', date.today()),
+            status=False,
+            total=data['total']
+        )
+
+        # Create the list of OrderStock entries
+        for item in data['stock']:
+            stock_id = item['stock_id']
+            quantity = item['quantity']
+
+            # Optional: check if stock_id exists
+            stock = Stock.query.get(stock_id)
+            if not stock:
+                return jsonify({"error": f"Stock ID {stock_id} not found"}), 400
+
+            order_item = OrderStock(
+                stock_id=stock_id,
+                quantity=quantity
+            )
+            new_order.order_items.append(order_item)
+
+        # Add to database
+        db.session.add(new_order)
+        db.session.commit()
+
+        return jsonify({"message": "Order created", "order_id": new_order.order_id}), 201
 
 
 @app.route("/stock", methods=['GET', 'POST'])

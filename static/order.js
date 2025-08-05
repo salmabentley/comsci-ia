@@ -1,4 +1,8 @@
 let order = []; //stock items in order
+let idFlag = false;
+let dateFlag = false;
+let total = 0;
+let quantityTemp = 1;
 
 function popup() {
     const popup = document.getElementById("popup");
@@ -9,15 +13,19 @@ function popup() {
     
 }
 
-function remove_item(event) {
-    event.preventDefault();
-    event.target.parentElement.remove();
-    const id = event.target.parentElement.children[0].textContent;
-    order.splice(order.findIndex(item => item.stock_id == id),1);
-    console.log(order);
+function checkComplete() {
+    const submit = document.getElementById('submit')
+    if (idFlag && dateFlag && order.length >0) {
+        submit.disabled = false;
+        return true;
+    } else {
+        submit.disabled = true;
+        return false;
+    }
 }
 
 function addItem() {
+
     const items = document.getElementById("items");
     const item = stock.find(item => item.name === items.value)
     const p = document.getElementById("error");
@@ -30,14 +38,11 @@ function addItem() {
         let i = order.findIndex(i => i.stock_id == item.stock_id)
         if (i != -1) {
             order[i].quantity++;
-            if (i!=0) {
-                stocklist.children[stocklist.length-i].children[3].value++;
-            } else {
-
-                stocklist.children[0].children[3].value++;
-            }
+            stocklist.children[i].children[3].value++;
             items.value="";
             console.log(order);
+            total += item.price*order[i].quantity;
+            updateTotal();
             return;
         }
         p.textContent="";
@@ -49,6 +54,13 @@ function addItem() {
             price: item.price,
             quantity: 1 // default
         });
+
+        const submit = document.getElementById('submit')
+        if (order.length > 0) {
+            submit.disabled = false;
+        } else {
+            submit.disabled = true;
+        }
 
 
         console.log(order);
@@ -65,6 +77,33 @@ function addItem() {
         quantity.type = "number";
         quantity.min = 1;
         quantity.value = 1;
+        quantity.onfocus = () => {
+            quantityTemp = parseInt(quantity.value)
+        }
+        quantity.onchange = () => {
+            let idx = order.findIndex(i => i.stock_id == item.stock_id);
+            order[idx].quantity = parseInt(quantity.value);
+            updateTotal();
+        }
+        function updateTotal() {
+            total = 0;
+            for (const item of order) {
+                total += item.price * item.quantity;
+            }
+            const totalElement = document.getElementById("total");
+            totalElement.textContent = `$${total.toFixed(2)}`;
+        }
+
+        function remove_item(event) {
+            event.preventDefault();
+            event.target.parentElement.remove();
+            const id = event.target.parentElement.children[0].textContent;
+            order.splice(order.findIndex(item => item.stock_id == id),1);
+            console.log(order);
+            checkComplete();
+            updateTotal();
+
+        }
 
         const bin = document.createElement("i");
         bin.className = "material-icons";
@@ -79,20 +118,87 @@ function addItem() {
         container.appendChild(quantity)
         container.appendChild(bin);
         stocklist.appendChild(container)
+        updateTotal();
     }
+    checkComplete();
 }
+
+async function submit() {
+    checkComplete();
+    // const checkbox = document.getElementById("check");
+    const date = document.getElementById("date").value;
+    const id = document.getElementById("id").value;
+    if (checkComplete()) {
+        await fetch('/order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: id,
+                date: date,
+                total: total,
+                order: order
+            })
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/order';
+            } else {
+                alert("Error submitting order. Please try again.");
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert("Error submitting order. Please try again.");
+        });
+    }
+
+}
+
 
 
 window.onload = () => {
     const date = document.getElementById("date");
     date.max = new Date().toISOString().split("T")[0]; 
+    date.addEventListener("input", () => {
+        if (date.value.trim() !== "") {
+            dateFlag = true;
+        } else {
+            dateFlag = false;
+        }
+        checkComplete();
+    });
     const checkbox = document.getElementById("check");
     checkbox.addEventListener("change", () => {
         const id = document.getElementById("id");
         if (checkbox.checked) {
             id.disabled = true;
+            id.required = false;
+            id.value = '';
+            id.removeEventListener("input", () => {
+                if (id.value.trim() !== "") {
+                    idFlag = true;
+                } else {
+                    idFlag = false;
+                }
+                checkComplete();
+            });
+            idFlag = true;
+            checkComplete();
+
         } else {
             id.disabled = false;
+            id.required = true;
+            idFlag = false;
+            id.addEventListener("input", () => {
+                if (id.value.trim() !== "") {
+                    idFlag = true;
+                } else {
+                    idFlag = false;
+                }
+                checkComplete();
+            });
+            checkComplete();
+
         }
     })
 }

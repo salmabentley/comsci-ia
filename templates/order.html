@@ -42,10 +42,10 @@
                 <div style="display:flex; gap: 5%; justify-content: center;">
                     <div>
                         <label for="total">Total:</label>
-                        <p id="total"></p>
+                        <p id="total">$0</p>
                     </div>
                     <div>
-                        <input type="text" id="items" name="items" placeholder="Search for items" list="stock" required><button onclick="addItem()">Add +</button><br>
+                        <input type="text" id="items" name="items" placeholder="Search for items" list="stock"><button onclick="addItem()">Add +</button><br>
                     </div>
                 </div>
                  <datalist id="stock">
@@ -56,13 +56,13 @@
                  <p id="error" style="color: red; margin: 1%;" ></p>
                  <div style="min-height: 30vh; background: rgba(0,0,0,0.1)">
                     <div style="display:flex; justify-content: space-between; padding: 0 4%;">
-                        <h4>Order ID</h4>
+                        <h4>Stock ID</h4>
                         <h4>Name</h4>
                         <h4>Price</h4>
                         <h4>Quantity</h4>
                         <h6></h6>
                     </div>
-                    <div id="stock-list">
+                    <div id="stock-list" style="overflow-y: scroll; max-height: 20vh;">
                         <!-- stock added dynamically -->
                     </div>
 
@@ -70,7 +70,7 @@
              </div>
             
              <br>
-            <button type="submit">Submit</button>
+            <button type="submit" id="submit" onclick="submit()" disabled>Submit</button>
     </div>
     <div id="top">
         <!-- <h4>Press save to lock in changes</h4> -->
