@@ -129,7 +129,7 @@ async function submit() {
     const date = document.getElementById("date").value;
     const id = document.getElementById("id").value;
     if (checkComplete()) {
-        await fetch('/order', {
+        await fetch('/orders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

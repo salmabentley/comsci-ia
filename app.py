@@ -4,6 +4,8 @@ import random
 import uuid
 import os
 from datetime import date
+from datetime import datetime
+
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -42,7 +44,7 @@ class Users(db.Model):
 
 class Orders(db.Model):
     __tablename__ = 'orders'
-    order_id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.String(50), primary_key=True)
     # user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     order_date = db.Column(db.Date, nullable=False, default=date.today)
     status = db.Column(db.Boolean, nullable=False)
@@ -73,8 +75,8 @@ class Stock(db.Model):
 
 class OrderStock(db.Model):
     __tablename__ = 'order_stock'
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), primary_key=True)
-    stock_id = db.Column(db.Integer, db.ForeignKey('stock.stock_id'), primary_key=True)
+    order_id = db.Column(db.String(50), db.ForeignKey('orders.order_id'), primary_key=True)
+    stock_id = db.Column(db.String(50), db.ForeignKey('stock.stock_id'), primary_key=True)
     quantity = db.Column(db.Integer, nullable=False)
 
     order = db.relationship('Orders', back_populates='order_items')
@@ -98,24 +100,42 @@ def manage_orders():
                 'image': item.image
             } for item in stock
         ]
-        return render_template('order.html', stock=stock_data)
+        orders = Orders.query.all()
+        order_data = [
+            {
+                'order_id': order.order_id,
+                'order_date': order.order_date.strftime('%Y-%m-%d'),
+                'status':order.status,
+                'total': order.total,
+                'order_items': [
+                    {
+                        'stock_id': order_item.stock_id,
+                        'quantity': order_item.quantity
+                    } for order_item in order.order_items
+                ]
+            } for order in orders
+        ]
+        return render_template('order.html', stock=stock_data, orders=order_data)
 
     elif request.method == 'POST':
         data = request.json
 
         # Generate or use provided order_id
-        order_id = data['id'] if data['id'] != '' else uuid.uuid4().int >> 64  # short int from UUID
+        order_id = data['id'] if data['id'] != '' else uuid.uuid4().hex   # short int from UUID
+        # Parse date string if provided, otherwise use today's date
+        date_str = data.get('date')
+        order_date = datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else date.today()
 
         # Create the Order object
         new_order = Orders(
             order_id=order_id,
-            order_date=data.get('date', date.today()),
+            order_date=order_date,
             status=False,
             total=data['total']
         )
 
         # Create the list of OrderStock entries
-        for item in data['stock']:
+        for item in data['order']:
             stock_id = item['stock_id']
             quantity = item['quantity']
 
@@ -131,10 +151,17 @@ def manage_orders():
             new_order.order_items.append(order_item)
 
         # Add to database
-        db.session.add(new_order)
-        db.session.commit()
+        try:
+            db.session.add(new_order)
+            db.session.commit()
+            print("✅ Order saved successfully")
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Failed to save order: {e}")
+            return jsonify({"error": "Failed to save order"}), 500
 
-        return jsonify({"message": "Order created", "order_id": new_order.order_id}), 201
+
+        return redirect(url_for('manage_orders'))
 
 
 @app.route("/stock", methods=['GET', 'POST'])

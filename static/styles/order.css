@@ -106,7 +106,7 @@ main {
 }
 
 #popup {
-    /* display: none; */
+    display: none;
     width: 50vw;
     height: fit-content;
     background-color: #384861;
@@ -116,18 +116,18 @@ main {
     border-radius: 20px;
     box-shadow: 1px 1px 20px 10px rgba(15, 1, 53, 0.6);
 }
-.stock {
+.order {
     padding: 0 4%;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.stock input {
+.order input {
     width: 7%;
 }
 
-.stock p {
+.order p {
     max-width: 10%;
     text-overflow: ellipsis;
     white-space: nowrap;

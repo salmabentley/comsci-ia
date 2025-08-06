@@ -80,24 +80,30 @@
         <div id="left">
             <h1>Order History</h1>
             <div class="labels">
-                <h4 style="margin-right: 25%;">ID</h4>
+                <h4>ID</h4>
                 <h4>Total</h4>
                 <h4>Items</h4>
-                <h4 style="margin-right: 5%;">Status</h4>
+                <h4>Status</h4>
             </div>
             <div id="order-history-container">
                 {% if orders %}
                     {% for order in orders %}
                         <div class="order">
-                            <h4>{{ order.id }}</h4>
-                            <h4>${{ order.total }}</h4>
-                            <h4>{{ order.items|length }}</h4>
-                            <h4>{{ order.status }}</h4>
+                            <p>{{ order.order_id }}</p>
+                            <p>${{ order.total }}</p>
+                            <p>{{order.order_items|length}}</p>
+                            <p>{{ order.status }}</p>
                         </div>
                     {% endfor %}
                 {% else %}
                     <p>No orders found</p>
                 {% endif %}
+                <!-- <div class="order">
+                    <p>sdjofh284fwadf</p>
+                    <p>$123</p>
+                    <p>3</p>
+                    <button class="status pending">Pending</button>
+                </div> -->
             </div>
         </div>
         <div id="right">
@@ -110,19 +116,19 @@
                 <button id="add" onclick="popup()">Add +</button>
             </div>
             <div class="labels">
-                <h4 style="margin-right: 25%;">ID</h4>
+                <h4>ID</h4>
                 <h4>Total</h4>
                 <h4>Items</h4>
-                <h4 style="margin-right: 5%;">Status</h4>
+                <h4>Status</h4>
             </div>
             <div id="order-history-container">
                 {% if orders %}
                     {% for order in orders %}
                         <div class="order">
-                            <h4>{{ order.id }}</h4>
-                            <h4>${{ order.total }}</h4>
-                            <h4>{{ order.items|length }}</h4>
-                            <h4>{{ order.status }}</h4>
+                            <p>{{ order.order_id }}</p>
+                            <p>${{ order.total }}</p>
+                            <p>{{order.order_items|length}}</p>
+                            <p>{{ order.status }}</p>
                         </div>
                     {% endfor %}
                 {% else %}

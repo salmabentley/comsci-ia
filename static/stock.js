@@ -97,6 +97,10 @@ async function addItem(event) {
     })
     popupClose();
     render_stock();
+    document.getElementById('name').value = '';
+    document.getElementById('category').value = '';
+    document.getElementById('price').value = '';
+    document.getElementById('input-value').value = '';
 };
 
 let active = null;
