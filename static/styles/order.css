@@ -65,6 +65,13 @@ h1 {
     width: 7vw;
 }
 
+.order p {
+    max-width: 5vw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 main {
     flex-direction: column;
 }
@@ -116,18 +123,18 @@ main {
     border-radius: 20px;
     box-shadow: 1px 1px 20px 10px rgba(15, 1, 53, 0.6);
 }
-.order {
+.stock {
     padding: 0 4%;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.order input {
+.stock input {
     width: 7%;
 }
 
-.order p {
+.stock p {
     max-width: 10%;
     text-overflow: ellipsis;
     white-space: nowrap;

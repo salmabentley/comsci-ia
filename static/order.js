@@ -3,6 +3,8 @@ let idFlag = false;
 let dateFlag = false;
 let total = 0;
 let quantityTemp = 1;
+let completedOrders = [];
+let pendingOrders = []
 
 function popup() {
     const popup = document.getElementById("popup");
@@ -142,7 +144,7 @@ async function submit() {
             })
         }).then(response => {
             if (response.ok) {
-                window.location.href = '/order';
+                window.location.href = '/orders';
             } else {
                 alert("Error submitting order. Please try again.");
             }
@@ -156,7 +158,77 @@ async function submit() {
 
 
 
+async function getOrders() {
+    await fetch('/get-orders').then(res => res.json())
+    .then(data => {
+        data.forEach(order => {
+            if (order.status === false) {
+                pendingOrders.push(order);
+            } else {
+                completedOrders.push(order);
+            }
+        })
+        renderOrders();
+        console.log('pending', pendingOrders);
+        console.log('completed', completedOrders)
+    })
+    .catch(err => console.log(err))
+}
+
+function renderOrders() {
+    const pendingList = document.getElementById('pending-order-container');
+    const completedList = document.getElementById('order-history-container');
+
+    pendingList.innerHTML = '';
+    completedList.innerHTML = '';
+
+    function orderFrontend(order, completed) {
+        const div = document.createElement('div');
+        div.className = 'order';
+        const id = document.createElement('p');
+        id.textContent = order.order_id;
+        const total = document.createElement('p');
+        total.textContent = `$${order.total}`;
+        const items = document.createElement('p');
+        items.textContent = order.order_items.length;
+        const statusButton = document.createElement('button');
+        completed ? statusButton.textContent = 'Completed' : statusButton.textContent = 'Pending';
+        completed ? statusButton.className = 'status completed' : statusButton.className = 'status pending';
+
+        statusButton.onclick = (e) => {
+            e.preventDefault();
+            console.log(e)
+        }
+        div.appendChild(id);
+        div.appendChild(total);
+        div.appendChild(items);
+        div.appendChild(statusButton);
+        completed ? completedList.appendChild(div) : pendingList.appendChild(div);
+    }
+
+    if (pendingOrders.length == 0) {
+        pendingList.innerHTML = '<p>No orders found</p>';
+    } else {
+        pendingOrders.forEach(order => {
+            orderFrontend(order, completed = false)
+        })
+    }
+
+    if (completedOrders.length == 0 ) {
+        completedList.innerHTML = '<p>No orders found</p>';
+    } else {
+        completedOrders.forEach(order => {
+            orderFrontend(order, completed = true)
+        })
+    }
+}
+
+
+
+// WINDOW FUNCTION
+
 window.onload = () => {
+    getOrders()
     const date = document.getElementById("date");
     date.max = new Date().toISOString().split("T")[0]; 
     date.addEventListener("input", () => {
@@ -202,4 +274,3 @@ window.onload = () => {
         }
     })
 }
-

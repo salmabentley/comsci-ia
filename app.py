@@ -84,7 +84,26 @@ class OrderStock(db.Model):
 
     def __repr__(self):
         return f"<OrderStock Order:{self.order_id} Stock:{self.stock_id} Qty:{self.quantity}>"
-  
+
+
+@app.route('/get-orders')
+def get_orders():
+    orders = Orders.query.all()
+    order_data = [
+        {
+            'order_id': order.order_id,
+            'order_date': order.order_date.strftime('%Y-%m-%d'),
+            'status':order.status,
+            'total': order.total,
+            'order_items': [
+                {
+                    'stock_id': order_item.stock_id,
+                    'quantity': order_item.quantity
+                } for order_item in order.order_items
+            ]
+        } for order in orders
+    ]
+    return jsonify(order_data)
 
 @app.route('/orders', methods=['GET', 'POST'])
 def manage_orders():
@@ -100,22 +119,7 @@ def manage_orders():
                 'image': item.image
             } for item in stock
         ]
-        orders = Orders.query.all()
-        order_data = [
-            {
-                'order_id': order.order_id,
-                'order_date': order.order_date.strftime('%Y-%m-%d'),
-                'status':order.status,
-                'total': order.total,
-                'order_items': [
-                    {
-                        'stock_id': order_item.stock_id,
-                        'quantity': order_item.quantity
-                    } for order_item in order.order_items
-                ]
-            } for order in orders
-        ]
-        return render_template('order.html', stock=stock_data, orders=order_data)
+        return render_template('order.html', stock=stock_data)
 
     elif request.method == 'POST':
         data = request.json
