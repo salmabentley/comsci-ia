@@ -5,6 +5,8 @@ import uuid
 import os
 from datetime import date
 from datetime import datetime
+import pandas as pd
+from datetime import datetime
 
 from werkzeug.utils import secure_filename
 
@@ -84,6 +86,71 @@ class OrderStock(db.Model):
 
     def __repr__(self):
         return f"<OrderStock Order:{self.order_id} Stock:{self.stock_id} Qty:{self.quantity}>"
+
+
+@app.route('/analytics')
+def analytics():
+    # Query all order data
+    orders = Orders.query.all()
+
+    # Create dataframe from orders
+    df = pd.DataFrame([{
+        'order_id': o.order_id,
+        'date': o.order_date,
+        'total': o.total,
+        'status': 'Complete' if o.status else 'Processing'
+    } for o in orders])
+
+    # Group by month for chart
+    df['month'] = pd.to_datetime(df['date']).dt.strftime('%B')  # 'March', 'April', etc.
+    monthly_data = df.groupby('month')['total'].agg(['sum', 'count']).reset_index()
+    monthly_data = monthly_data.sort_values(by='month')
+    df['date'] = pd.to_datetime(df['date'])
+
+    # Calculate this month's revenue and orders
+    now = datetime.now()
+    this_month_df = df[df['date'].dt.month == now.month]
+    this_month_orders = len(this_month_df)
+    this_month_revenue = this_month_df['total'].sum()
+
+    # Get best/worst seller
+    order_stocks = OrderStock.query.all()
+    sales_data = {}
+
+    for os in order_stocks:
+        stock_id = os.stock_id
+        stock = Stock.query.get(stock_id)
+        if stock_id not in sales_data:
+            sales_data[stock_id] = {'name': stock.name, 'orders': 0, 'revenue': 0, 'image': stock.image}
+        sales_data[stock_id]['orders'] += os.quantity
+        sales_data[stock_id]['revenue'] += os.quantity * stock.price
+
+    sorted_sales = sorted(sales_data.values(), key=lambda x: x['orders'], reverse=True)
+    best_seller = sorted_sales[0] if sorted_sales else None
+    worst_seller = sorted_sales[-1] if sorted_sales else None
+    # Group by Month
+    df['month'] = df['date'].dt.strftime('%B')
+    month_data = df.groupby('month')['total'].sum().reset_index()
+
+    # Group by Day (latest 7 days)
+    df['day'] = df['date'].dt.strftime('%Y-%m-%d')
+    day_data = df.groupby('day')['total'].sum().reset_index().tail(7)
+
+    # Group by Year
+    df['year'] = df['date'].dt.year
+    year_data = df.groupby('year')['total'].sum().reset_index()
+
+
+    return render_template('analytics.html',
+                            month_data=month_data.to_dict(orient='records'),
+                            day_data=day_data.to_dict(orient='records'),
+                            year_data=year_data.to_dict(orient='records'),
+                           monthly_data=monthly_data.to_dict(orient='records'),
+                           order_summary=df.tail(5).to_dict(orient='records'),
+                           this_month_orders=this_month_orders,
+                           this_month_revenue=this_month_revenue,
+                           best_seller=best_seller,
+                           worst_seller=worst_seller)
 
 
 @app.route('/get-orders')

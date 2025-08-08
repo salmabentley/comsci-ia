@@ -1,0 +1,99 @@
+button{% extends "boiler.html" %}
+
+{% block title %} Analytics {% endblock %}
+
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    window.analyticsData = {
+        monthLabels: {{ month_data | map(attribute='month') | list | tojson }},
+        monthValues: {{ month_data | map(attribute='total') | list | tojson }},
+        dayLabels: {{ day_data | map(attribute='day') | list | tojson }},
+        dayValues: {{ day_data | map(attribute='total') | list | tojson }},
+        yearLabels: {{ year_data | map(attribute='year') | list | tojson }},
+        yearValues: {{ year_data | map(attribute='total') | list | tojson }}
+    };
+    </script>
+    <script src="{{ url_for('static', filename='analytics.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/styles/analytics.css') }}">
+
+{% endblock %}
+
+{% block content %}
+
+<main>
+    <div id="left">
+        <h2>Analytics</h2>
+        <div>
+          <button class="toggle-button">Month</button>
+          <button class="toggle-button">Day</button>
+          <button class="toggle-button">Year</button>
+          </div>
+        
+        <div style="width: 600px;">
+          <canvas id="salesChart"></canvas>
+        </div>
+        
+        <div id="revenue">
+          <h3>This Month</h3>
+          <div style="display: flex; gap: 30%; width: 75%; justify-content: center;">
+              <p><b style="color: 88A7F8;">{{ this_month_orders }}</b><br> Orders</p>
+              <p><b style="color: 88A7F8">${{ this_month_revenue }}</b><br> Revenue</p>
+          </div>
+        </div>
+    </div>
+    
+    <div id="right">
+        <div class="card" style="background: #33233A; text-align: left;">    
+            <div id="best_seller">
+              <h3 style="color:#57D581; margin-top: 0;">Best Seller - {{ best_seller.name }}</h3>
+              <div style="display: flex; justify-content: space-between; padding: 0 15% ;">
+                {% if best_seller.image == None %}
+                  <img src="{{url_for('static', filename='/uploads/placeholder.svg')}}" width="60">
+
+                {% else %}
+                  <img src="{{url_for('static', filename='/uploads/' ~  best_seller.image )}}" width="60">
+                {% endif %}
+                  <div>
+                      ${{ best_seller.revenue }}<br><br>
+                      {{ best_seller.orders }} Orders
+                  </div>
+              </div>
+            </div>
+            
+            <div id="worst_seller">
+              <h3 style="color:#EA7E7E">Worst Seller - {{ worst_seller.name }}</h3>
+              <div style="display: flex; justify-content: space-between; padding: 0 15% ;">
+                {% if worst_seller.image == None %}
+                  <img src="{{url_for('static', filename='/uploads/placeholder.svg')}}" width="60">
+
+                {% else %}
+                  <img src="{{url_for('static', filename='/uploads/' ~  worst_seller.image )}}" width="60">
+                {% endif %}
+                <div>
+                    ${{ worst_seller.revenue }}<br><br>
+                    {{ worst_seller.orders }} Orders
+                </div>
+              </div>
+            </div>
+        </div>
+        
+        <div class="card" style="background: #241640">
+          <h3 style="margin-top: 0;">Order Summary</h3>
+          <table style="color: white">
+            <tr><th>ID</th><th>Total</th><th>Status</th></tr>
+            {% for order in order_summary[:5] %}
+            <tr>
+              <td>{{ order.order_id }}</td>
+              <td>${{ order.total }}</td>
+              <td><span class="{{ 'completed' if order.status == 'Complete' else 'processing' }}">{{ order.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+    </div>
+</main>
+
+
+  {% endblock %}
