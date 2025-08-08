@@ -53,8 +53,27 @@ h1 {
     background: #009E35;
 }
 
+.completed:hover {
+    background: #007427;
+}
+
 .pending {
     background: #CF0909;
+}
+
+.pending:hover {
+    background: #810606;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    z-index: 4;
+    background-color: rgba(0,0,0,0.5);
+    width: 100vw;
+    height: 100vh;
+    cursor: pointer;
+    display: none;
 }
 
 .status {
@@ -63,10 +82,12 @@ h1 {
     padding: 1% 2%;
     border-radius: 10px;
     width: 7vw;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
 .order p {
-    max-width: 5vw;
+    max-width: 4vw;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -139,4 +160,9 @@ main {
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+}
+
+#pending-order-container, #order-history-container {
+    height: 30vh;
+    overflow-y: scroll;
 }

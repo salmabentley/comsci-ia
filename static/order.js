@@ -5,6 +5,7 @@ let total = 0;
 let quantityTemp = 1;
 let completedOrders = [];
 let pendingOrders = []
+let changedOrders = [];
 
 function popup() {
     const popup = document.getElementById("popup");
@@ -13,6 +14,13 @@ function popup() {
     overlay.style.display = "block";
 
     
+}
+
+function popupClose() {
+    const popup = document.getElementById("popup");
+    const overlay = document.getElementById("overlay");
+    popup.style.display = "none";
+    overlay.style.display = "none";
 }
 
 function checkComplete() {
@@ -175,6 +183,71 @@ async function getOrders() {
     .catch(err => console.log(err))
 }
 
+function handleClick(button, e, completed) {
+
+    e.preventDefault();
+    const id = e.target.parentElement.children[0].textContent;
+    if (changedOrders.includes(id)) {
+        let i = changedOrders.findIndex(order_id=>order_id===id);
+        changedOrders.splice(i,1);
+    } else {
+        changedOrders.push(id);
+    }
+    let newStatus = !completed;
+    console.log(newStatus)
+    if (newStatus) {
+        button.className = "status completed";
+        let i = pendingOrders.findIndex(order=>order.order_id===id);
+        console.log(i)
+        const target = pendingOrders[i];
+        completedOrders.push(target);
+        pendingOrders.splice(i,1);
+    } else {
+        button.className = "status pending"
+        let i = completedOrders.findIndex(order=>order.order_id===id);
+        const target = completedOrders[i];
+        pendingOrders.push(target);
+        completedOrders.splice(i,1);
+    }
+    console.log('pending', pendingOrders);
+    console.log('completed', completedOrders)
+    renderOrders();
+    checkChanges();
+}
+
+function checkChanges() {
+    const save = document.getElementById('save');
+    const warning = document.getElementById('warning');
+    if (changedOrders.length === 0) {
+        save.disabled = true;
+        warning.style.display = 'none';
+    } else {
+        save.disabled = false;
+        warning.style.display = 'block';
+    }
+}
+
+async function save() {
+    await fetch('/update-orders', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            orders: changedOrders
+        })
+    }).then(response=>{
+        if (response.ok) {
+            window.location.href = '/orders';
+        } else {
+            alert("Error submitting order. Please try again.");
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert("Error submitting order. Please try again.");
+    });
+}
+
 function renderOrders() {
     const pendingList = document.getElementById('pending-order-container');
     const completedList = document.getElementById('order-history-container');
@@ -196,8 +269,7 @@ function renderOrders() {
         completed ? statusButton.className = 'status completed' : statusButton.className = 'status pending';
 
         statusButton.onclick = (e) => {
-            e.preventDefault();
-            console.log(e)
+            handleClick(statusButton, e, completed);
         }
         div.appendChild(id);
         div.appendChild(total);

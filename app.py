@@ -105,6 +105,16 @@ def get_orders():
     ]
     return jsonify(order_data)
 
+@app.route('/update-orders', methods = ['PATCH'])
+def update_orders():
+    data = request.json
+    orders = data['orders']
+    for order in orders:
+        target = db.session.execute(db.select(Orders).filter_by(order_id=order)).scalar_one_or_none()
+        target.status = not target.status
+    db.session.commit()
+    return ''
+
 @app.route('/orders', methods=['GET', 'POST'])
 def manage_orders():
     if request.method == 'GET':
