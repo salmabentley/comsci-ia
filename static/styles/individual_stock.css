@@ -91,7 +91,10 @@ input {
 
 
 #labels {
+    padding: 0 7%;
     border-bottom: 2px solid white;
+    display: flex;
+    justify-content: space-between;
 }
 
 #order-container {
@@ -124,4 +127,34 @@ img {
     height: 100vh;
     cursor: pointer;
     display: none;
+}
+
+.order {
+    background: #33233A;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10%;
+    padding: 0 5%;
+    margin: 1% 0;
+}
+
+.order p {
+    max-width: 15%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: no-wrap;
+}
+
+.order p:nth-child(3) {
+    max-width: none;
+}
+
+#orders {
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    /* gap: 5%; */
 }

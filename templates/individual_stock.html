@@ -32,12 +32,12 @@
                     </div>
                     <div id="stock-info">
                         <div class="stock">
-                            <h2>{{stock.stock_level}}</h2>
+                            <h2 id="stock_level">{{stock.stock_level}}</h2>
                             <h4>Stock left</h4>
                         </div>
                         <div class="stock">
-                            <h2>{{stock.stock_level}}</h2>
-                            <h4>Stock left</h4>
+                            <h2 id="stock_needed">{{stock.stock_level}}</h2>
+                            <h4>Stock Needed</h4>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,22 @@
                     <h4>Status</h4>
                 </div>
                 <div id="orders">
-    
+                    {% if orders %}
+                        {% for order in orders %}
+                            <div class="order">
+                                <p>{{order.id}}</p>
+                                <p>{{order.quantity}}</p>
+                                {% if order.status %}
+                                    <p style="color: green">Completed</p>
+                                {% else %}
+                                    <p style="color: red">Pending</p>
+                                {% endif %}
+                                
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No orders</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

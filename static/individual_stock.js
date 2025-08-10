@@ -1,4 +1,34 @@
 let toggle = false;
+let needed = 0;
+
+function calculateNeeded() {
+
+    document.querySelectorAll('.order').forEach(orderEl => {
+    const quantity = Number(orderEl.querySelector('p:nth-child(2)')?.textContent.trim()) || 0;
+    const status = orderEl.querySelector('p:nth-child(3)')?.textContent.trim().toLowerCase();
+
+    if (status === 'pending') {
+        needed += quantity;
+    }
+    });
+
+    let stock_level = document.getElementById('stock_level').textContent;
+    let target = document.getElementById('stock_needed')
+    target.textContent = needed;
+    if (Number(stock_level) > needed) {
+        target.style.color = '#009E35';
+    } else {
+        target.style.color = '#CF0909';
+    }
+
+    if (stock_level >= 50) {
+        document.getElementById('stock_level').style.color = "#009E35";
+    } else if (stock_level >= 15) {
+        document.getElementById('stock_level').style.color = "#CF5C09";
+    } else {
+        document.getElementById('stock_level').style.color = "#CF0909";
+    }
+}
 
 function popup() {
     const input = document.getElementById("quantity");
@@ -61,4 +91,8 @@ function popupClose() {
 
     const overlay = document.getElementById("overlay");
     overlay.style.display = "none";
+}
+
+window.onload=()=> {
+    calculateNeeded();
 }

@@ -313,8 +313,34 @@ def update_stock():
 
 @app.route('/stock/<stock_id>')
 def individual_stock(stock_id):
-    stock = db.session.execute(db.select(Stock).filter_by(stock_id=stock_id)).scalar_one_or_none()
-    return render_template('individual_stock.html', stock=stock)
+    # Get stock object
+    stock = db.session.execute(
+        db.select(Stock).filter_by(stock_id=stock_id)
+    ).scalar_one_or_none()
+
+    if not stock:
+        return "Stock not found", 404
+
+    # Get all OrderStock entries for this stock
+    order_stocks = db.session.execute(
+        db.select(OrderStock).filter_by(stock_id=stock.stock_id)
+    ).scalars().all()
+
+    # Build the orders list using the related Orders object
+    orders = [
+        {
+            'id': os.order.order_id,
+            'date': os.order.order_date,
+            'status': os.order.status,
+            'total': os.order.total,
+            'quantity': os.quantity
+        }
+        for os in order_stocks
+    ]
+
+    return render_template('individual_stock.html', stock=stock, orders=orders)
+
+
 
 
 if __name__ == '__main__':
