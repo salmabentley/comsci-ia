@@ -14,7 +14,7 @@
     <main>
         <div class="container">
             <div id="left">
-                <h1 style="text-align: left;" id="name">{{stock.name}}</h1>
+                <h1 style="text-align: left;" id="name">{{stock.name}} <i class="material-icons" onclick="deleteStock()" style="color: red; cursor: pointer;">delete</i></h1>
                 {% if stock.image == None %}
                     <img src="{{url_for('static', filename='/uploads/placeholder.svg')}}" alt="">
                 {% else %}

@@ -1,6 +1,13 @@
 let toggle = false;
 let needed = 0;
 
+async function deleteStock() {
+    await fetch(window.location.href, {
+        method: 'DELETE'
+    }).then(()=> window.location.href = '/stock')
+    .catch((e) => console.log(e))
+}
+
 function calculateNeeded() {
 
     document.querySelectorAll('.order').forEach(orderEl => {
