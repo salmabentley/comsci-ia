@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     let currentView = 'Month';
+    document.getElementById('monthButton').focus();
 
     const salesChart = new Chart(ctx, {
         type: 'bar',

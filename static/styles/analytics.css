@@ -43,7 +43,55 @@ main {
 }
 
 .completed, .processing {
-    padding: 5%;
-    width: 10vw;
+    /* padding: 5%; */
+    width: 5vw;
     border-radius: 5px;
+    padding: 2%;
+}
+
+.labels, .order {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.labels{
+    padding: 0% 5%;
+}
+
+.labels h4 {
+    margin: 0;
+}
+
+
+.order p {
+    max-width: 20%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.order {
+    padding: 2% 5%;
+    background: #33233A;
+    margin: 2% 0;
+}
+
+body {
+    max-height: 100vh;
+    overflow: hidden;
+}
+
+button {
+    margin: 0;
+    border: none;
+    padding: 1vw;
+    background-color: #333BCF;
+    color: white;
+    width: 5vw;
+}
+
+button:active, button:focus {
+    background: #072689;
 }

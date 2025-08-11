@@ -25,10 +25,10 @@ button{% extends "boiler.html" %}
 <main>
     <div id="left">
         <h2>Analytics</h2>
-        <div>
-          <button class="toggle-button">Month</button>
+        <div style="display: flex;">
+          <button class="toggle-button" id='monthButton' style="border-radius: 10px 0px 0px 10px; border-right: 2px solid rgba(106,146,207,0.5)">Month</button>
           <button class="toggle-button">Day</button>
-          <button class="toggle-button">Year</button>
+          <button class="toggle-button" style="border-radius: 0 10px 10px 0; border-left: 2px solid rgba(106,146,207,0.5)">Year</button>
           </div>
         
         <div style="width: 600px;">
@@ -81,16 +81,22 @@ button{% extends "boiler.html" %}
         
         <div class="card" style="background: #241640">
           <h3 style="margin-top: 0;">Order Summary</h3>
-          <table style="color: white">
-            <tr><th>ID</th><th>Total</th><th>Status</th></tr>
-            {% for order in order_summary[:5] %}
-            <tr>
-              <td>{{ order.order_id }}</td>
-              <td>${{ order.total }}</td>
-              <td><span class="{{ 'completed' if order.status == 'Complete' else 'processing' }}">{{ order.status }}</span></td>
-            </tr>
-            {% endfor %}
-          </table>
+          <div style="color: white">
+            <div class="labels">
+              <h4>Order ID</h4>
+              <h4>Total</h4>
+              <h4>Status</h4>
+            </div>
+            <div style="max-height: 20vh; overflow-y: scroll;">
+              {% for order in order_summary[:3] %}
+                <div class="order">
+                  <p>{{ order.order_id }}</p>
+                  <p>${{ order.total }}</p>
+                  <span class="{{ 'completed' if order.status == 'Complete' else 'processing' }}">{{ order.status }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
         </div>
     </div>
 </main>
