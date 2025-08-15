@@ -1,0 +1,36 @@
+{% extends "boiler.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+    <script src="/static/dashboard.js"></script>
+{% endblock %}
+
+{% block content %}
+    <main>
+        <div id="top">
+            <div id="analytics">
+                <h3>Weekly Analytics</h3>
+                <div id="sales-container">
+                    <p>Sales</p>
+                    <p id="sales">$2439</p>
+                    <p>Last Week's Sales</p>
+                    <p id="last-week">$2451</p>
+                </div>
+            </div>
+            <div id="pending-orders">
+                <h3>Pending Orders</h3>
+                <div id="order-container">
+
+                </div>
+            </div>
+        </div>
+        <div id="bottom">
+            <h3>Low Stock</h3>
+            <div id="stock-container">
+
+            </div>
+        </div>
+    </main>
+{% endblock %}

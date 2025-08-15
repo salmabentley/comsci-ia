@@ -1,0 +1,28 @@
+main {
+    background: #1D041A;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#pending-orders, #analytics, #bottom {
+    background: #d9d9d91f;
+    border-radius: 10px;
+}
+
+#top, #bottom {
+    width: 80vw;
+}
+
+#top {
+    display: flex;
+    gap: 5%;
+    justify-content: space-between;
+    margin: 2% 0;
+}
+
+#analytics, #pending-orders {
+    padding: 5%;
+    width: 40%;
+}
