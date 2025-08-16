@@ -26,3 +26,17 @@ main {
     padding: 5%;
     width: 40%;
 }
+
+#stock-container {
+    width: 90%;
+    height: 30vh;
+    overflow-y: scroll;
+    margin-bottom: 5%;
+}
+
+#bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}

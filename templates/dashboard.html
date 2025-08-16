@@ -5,6 +5,8 @@
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
     <script src="/static/dashboard.js"></script>
+    <script src="{{ url_for('static', filename='components/stock.js') }}" defer></script>
+
 {% endblock %}
 
 {% block content %}
@@ -29,7 +31,7 @@
         <div id="bottom">
             <h3>Low Stock</h3>
             <div id="stock-container">
-
+                <stock-card name="Bottle" category="Accessories" quantity="55"></stock-card>
             </div>
         </div>
     </main>
