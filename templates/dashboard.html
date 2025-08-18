@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
     <script src="/static/dashboard.js"></script>
     <script src="{{ url_for('static', filename='components/stock.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='components/order.js') }}" defer></script>
 
 {% endblock %}
 
@@ -24,14 +25,27 @@
             <div id="pending-orders">
                 <h3>Pending Orders</h3>
                 <div id="order-container">
-
+                    {% if orders %}
+                        {% for order in orders %}
+                            <order-card order="{{ order | tojson | safe }}"></order-card>
+                        {% endfor %}
+                    {% else %}
+                        <p>No Pending Orders</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
         <div id="bottom">
             <h3>Low Stock</h3>
             <div id="stock-container">
-                <stock-card name="Bottle" category="Accessories" quantity="55"></stock-card>
+                {% if stock %}
+                    {% for s in stock %}
+                        <stock-card name={{s.name}} category={{s.category}} quantity={{s.stock_level}}></stock-card>
+                    {% endfor %}
+                {% else %}
+                    <p>No Low Stock</p>
+                {% endif %}
+
             </div>
         </div>
     </main>

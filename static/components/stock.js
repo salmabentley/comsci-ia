@@ -7,7 +7,14 @@ class Stock extends HTMLElement {
         const name = this.getAttribute("name") || "";
         const category = this.getAttribute("category") || "";
         const quantity = this.getAttribute("quantity") || "";
-        const color = this.getAttribute("color") || "#000";
+        let color;
+        if (quantity >= 50) {
+            color = "#009E35";
+        } else if (quantity >= 15) {
+            color = "#CF5C09";
+        } else {
+            color = "#CF0909";
+        }
         this.innerHTML = `
                 <style>
                     .stock-container {

@@ -89,7 +89,19 @@ class OrderStock(db.Model):
 
 @app.route('/')
 def dashboard():
-    return render_template('dashboard.html')
+    stock = db.session.execute(db.select(Stock).filter(Stock.stock_level<15)).scalars()
+    orders = db.session.execute(db.select(Orders).filter_by(status=False)).scalars()
+
+    orders_list = []
+    for order_obj in orders:
+        orders_list.append({
+            'order_id': order_obj.order_id,
+            'total': order_obj.total,
+            'status': order_obj.status,
+            'items': len(order_obj.order_items)
+            # Manually include other attributes you need
+        })
+    return render_template('dashboard.html', stock=stock, orders=orders_list)
 
 @app.route('/analytics')
 def analytics():
