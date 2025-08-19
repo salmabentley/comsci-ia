@@ -4,9 +4,16 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
-    <script src="/static/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', filename='components/stock.js') }}" defer></script>
     <script src="{{ url_for('static', filename='components/order.js') }}" defer></script>
+    <script>
+        let sales_data_js = {{sales_data|tojson|safe}};
+        let sales_label = sales_data_js.labels;
+        let sales_values = sales_data_js.values;
+        
+    </script>
+    <script src="/static/dashboard.js"></script>
 
 {% endblock %}
 
@@ -14,12 +21,19 @@
     <main>
         <div id="top">
             <div id="analytics">
-                <h3>Weekly Analytics</h3>
                 <div id="sales-container">
+                    <h3>Weekly Analytics</h3>
                     <p>Sales</p>
-                    <p id="sales">$2439</p>
+                    <p id="sales">${{weekly_sales}}</p>
                     <p>Last Week's Sales</p>
-                    <p id="last-week">$2451</p>
+                    <p id="last-week">${{last_week_sales}}</p>
+                    <p class="{% if percentage < 0 %}negative{% endif %}">
+                        {{ "%.1f" % percentage }}%
+                    </p>
+
+                </div>
+                <div style="width: 50%;">
+                    <canvas id="salesChart"></canvas>
                 </div>
             </div>
             <div id="pending-orders">
@@ -27,7 +41,7 @@
                 <div id="order-container">
                     {% if orders %}
                         {% for order in orders %}
-                            <order-card order="{{ order | tojson | safe }}"></order-card>
+                            <order-card data-order='{{ order | tojson | escape }}''></order-card>
                         {% endfor %}
                     {% else %}
                         <p>No Pending Orders</p>

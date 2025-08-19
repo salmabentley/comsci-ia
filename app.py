@@ -3,10 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 import random
 import uuid
 import os
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime, timedelta
 import pandas as pd
-from datetime import datetime
+from sqlalchemy import func
 
 from werkzeug.utils import secure_filename
 
@@ -89,7 +88,53 @@ class OrderStock(db.Model):
 
 @app.route('/')
 def dashboard():
-    stock = db.session.execute(db.select(Stock).filter(Stock.stock_level<15)).scalars()
+    today = date.today()
+    start_of_week = today - timedelta(days=today.weekday())   # Monday of current week
+    start_of_last_week = start_of_week - timedelta(days=7)
+    end_of_last_week = start_of_week - timedelta(days=1)
+
+    # --- Current Week Sales (grouped by day) ---
+    weekly_sales = (
+        db.session.query(
+            func.strftime('%w', Orders.order_date).label("weekday"),  # 0=Sunday ... 6=Saturday
+            func.sum(Orders.total).label("total")
+        )
+        .filter(Orders.order_date >= start_of_week)
+        .group_by("weekday")
+        .all()
+    )[0][1]
+
+    # --- Last Week Total ---
+    last_week_sales = (
+        db.session.query(func.sum(Orders.total))
+        .filter(Orders.order_date >= start_of_last_week, Orders.order_date <= end_of_last_week)
+        .scalar()
+    ) or 0
+
+    # --- Chart: Last 3 days sales ---
+    three_days_ago = today - timedelta(days=2)
+    last_three_sales = (
+        db.session.query(
+            Orders.order_date,
+            func.sum(Orders.total).label("total")
+        )
+        .filter(Orders.order_date >= three_days_ago)
+        .group_by(Orders.order_date)
+        .order_by(Orders.order_date)
+        .all()
+    )
+
+    # format labels/values
+    labels = [row.order_date.strftime("%a") for row in last_three_sales]  # Mon, Tue, Wed
+    values = [float(row.total) for row in last_three_sales]
+    sales_data = {"labels": labels, "values": values}
+
+    current_sales = sum(values)
+    print(values)
+    percentage_change = ((current_sales - last_week_sales) / last_week_sales * 100) if last_week_sales > 0 else 0
+
+    # --- Stock & Orders (unchanged) ---
+    stock = db.session.execute(db.select(Stock).filter(Stock.stock_level < 15)).scalars()
     orders = db.session.execute(db.select(Orders).filter_by(status=False)).scalars()
 
     orders_list = []
@@ -99,9 +144,18 @@ def dashboard():
             'total': order_obj.total,
             'status': order_obj.status,
             'items': len(order_obj.order_items)
-            # Manually include other attributes you need
         })
-    return render_template('dashboard.html', stock=stock, orders=orders_list)
+
+    return render_template(
+        'dashboard.html', 
+        stock=stock, 
+        orders=orders_list,
+        weekly_sales=weekly_sales,
+        last_week_sales=last_week_sales,
+        percentage=percentage_change,
+        sales_data=sales_data
+    )
+
 
 @app.route('/analytics')
 def analytics():

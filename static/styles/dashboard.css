@@ -17,19 +17,19 @@ main {
 
 #top {
     display: flex;
-    gap: 5%;
+    /* gap: 3%; */
     justify-content: space-between;
     margin: 2% 0;
 }
 
 #analytics, #pending-orders {
-    padding: 5%;
-    width: 40%;
+    padding: 1% 3%;
+    width: 42%;
 }
 
 #stock-container {
     width: 90%;
-    height: 30vh;
+    height: 20vh;
     overflow-y: scroll;
     margin-bottom: 5%;
 }
@@ -40,3 +40,44 @@ main {
     align-items: center;
     justify-content: center;
 }
+
+#analytics {
+    display: flex;
+    align-items: center;
+}
+
+#sales-container {
+    width: 50%;
+}
+
+#order-container {
+    height: 20vh;
+    overflow-y: scroll;
+}
+
+#sales, #last-week {
+    color: #009E35;
+}
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      color: white;
+      width: 50%;
+    }
+    .sales {
+      font-size: 24px;
+      color: #3ef03e;
+    }
+    .last-sales {
+      font-size: 18px;
+      color: #41f2b0;
+    }
+    .negative {
+      color: #f24141;
+    }
+    canvas {
+      margin-top: 20px;
+      width: 50%;
+    }

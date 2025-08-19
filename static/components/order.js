@@ -4,9 +4,10 @@ class Order extends HTMLElement {
     }
 
     connectedCallback() {
-        const orderAttribute = this.getAttribute('order')
-        const order = JSON.parse(orderAttribute)
+        // const orderAttribute = this.getAttribute('order')
+        const order = JSON.parse(this.dataset.order)
         const order_id=order.order_id
+        console.log(order_id)
         const total = order.total;
         const items = order.items;
         this.innerHTML = `
@@ -37,12 +38,28 @@ class Order extends HTMLElement {
             .pending:hover {
                 background: #810606;
             }
+                .status {
+                    color: white;
+                    border: none;
+                    padding: 1% 2%;
+                    border-radius: 10px;
+                    width: 7vw;
+                    cursor: pointer;
+                    transition: 0.3s;
+                }
+
+                .order p {
+                    max-width: 4vw;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                }
             </style>
             <div class='order'>
-                <p>${{order_id}}</p>
-                <p>$${{total}}</p>
-                <p>${{items}}</p>
-                <button class='pending'>Pending</button>
+                <p>${order_id}</p>
+                <p>$${total}</p>
+                <p>${items}</p>
+                <button class='status pending'>Pending</button>
             </div>
         `
 
