@@ -99,8 +99,9 @@ async function addItem(event) {
     render_stock();
     document.getElementById('name').value = '';
     document.getElementById('category').value = '';
+    document.getElementById('image').files[0] = null;
     document.getElementById('price').value = '';
-    document.getElementById('input-value').value = '';
+    document.getElementById('input-value').value = 0;
 };
 
 let active = null;

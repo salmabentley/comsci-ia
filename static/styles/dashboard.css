@@ -34,6 +34,7 @@ main {
     margin-bottom: 5%;
 }
 
+
 #bottom {
     display: flex;
     flex-direction: column;
@@ -55,7 +56,7 @@ main {
     overflow-y: scroll;
 }
 
-#sales, #last-week {
+#sales, #last-week, .positive {
     color: #009E35;
 }
 
@@ -77,6 +78,7 @@ main {
     .negative {
       color: #f24141;
     }
+    
     canvas {
       margin-top: 20px;
       width: 50%;

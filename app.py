@@ -86,6 +86,10 @@ class OrderStock(db.Model):
     def __repr__(self):
         return f"<OrderStock Order:{self.order_id} Stock:{self.stock_id} Qty:{self.quantity}>"
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 @app.route('/')
 def dashboard():
     today = date.today()

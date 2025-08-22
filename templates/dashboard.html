@@ -27,7 +27,7 @@
                     <p id="sales">${{weekly_sales}}</p>
                     <p>Last Week's Sales</p>
                     <p id="last-week">${{last_week_sales}}</p>
-                    <p class="{% if percentage < 0 %}negative{% endif %}">
+                    <p class="{% if percentage < 0 %}negative {% else %} positive {% endif %}">
                         {{ "%.1f" % percentage }}%
                     </p>
 
