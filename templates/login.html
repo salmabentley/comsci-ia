@@ -9,16 +9,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/global.css') }}">
     <script src="/static/login.js"></script>
 </head>
 <body>
-    <header><p>This site is for admin only, click <a href="http://lostidles.com">here</a> to redirect to the main site.</p><i class="material-icons">close</i></header>
+    <header><p>This site is for admin only, click <a href="http://lostidles.com">here</a> to redirect to the main site.</p>
+        <i class="material-icons" style="cursor: pointer" onclick="closePopup()">close</i></header>
     <main>
-        <div>
-            <h2>Login</h2>
-            <input type="text">
-            <input type="text">
-            <button type="submit"></button>
+        <div class="container">
+            <h1>Login</h1>
+            <input type="text" placeholder="Username">
+            <input type="text" placeholder="Password">
+            <button type="submit" id="submit">Submit</button>
         </div>
     </main>
 </body>

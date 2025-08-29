@@ -98,15 +98,19 @@ def dashboard():
     end_of_last_week = start_of_week - timedelta(days=1)
 
     # --- Current Week Sales (grouped by day) ---
-    weekly_sales = (
-        db.session.query(
-            func.strftime('%w', Orders.order_date).label("weekday"),  # 0=Sunday ... 6=Saturday
-            func.sum(Orders.total).label("total")
-        )
-        .filter(Orders.order_date >= start_of_week)
-        .group_by("weekday")
-        .all()
-    )[0][1]
+    try:
+        weekly_sales = (
+            db.session.query(
+                func.strftime('%w', Orders.order_date).label("weekday"),  # 0=Sunday ... 6=Saturday
+                func.sum(Orders.total).label("total")
+            )
+            .filter(Orders.order_date >= start_of_week)
+            .group_by("weekday")
+            .all()
+        )[0][1]
+    except:
+        weekly_sales = 0
+
 
     # --- Last Week Total ---
     last_week_sales = (
