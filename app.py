@@ -1,6 +1,8 @@
 from flask import Flask, request, redirect, render_template, jsonify, json, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import random
+from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import os
 from datetime import date, datetime, timedelta
@@ -13,10 +15,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
 #image checks
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # max 2MB
+app.config['MAX_CONTENT_LENGTH'] = 512 * 1024 * 1024 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -29,19 +33,33 @@ def show_stock_table():
     stock = Stock.query.all()
     print(stock[0])
 
+@app.cli.command('reset-users')
+def reset_users():
+    Users.__table__.drop(db.engine)
+    db.create_all()
+@app.cli.command('reset-orders')
+def reset_users():
+    Orders.__table__.drop(db.engine)
+    db.create_all()
 
-
-class Users(db.Model):
+class Users(UserMixin, db.Model):
     __tablename__ = 'users'
-    user_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(50), primary_key=True)
     username = db.Column(db.String(50), nullable=False)
-    password = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(5000), nullable=False)
 
-    # orders = db.relationship('Orders', back_populates='user', cascade="all, delete-orphan")
+    orders = db.relationship('Orders', back_populates='user', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User {self.username}>"
+    
+    def get_id(self):
+        return str(self.user_id)
 
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(user_id)
 
 class Orders(db.Model):
     __tablename__ = 'orders'
@@ -51,8 +69,8 @@ class Orders(db.Model):
     status = db.Column(db.Boolean, nullable=False)
     total = db.Column(db.Float, nullable=False)
     
-
-    # user = db.relationship('Users', back_populates='orders')  
+    user_id = db.Column(db.String(50), db.ForeignKey('users.user_id'))
+    user = db.relationship('Users', back_populates='orders')  
     order_items = db.relationship('OrderStock', back_populates='order', cascade="all, delete-orphan")
 
     def __repr__(self):
@@ -86,11 +104,59 @@ class OrderStock(db.Model):
     def __repr__(self):
         return f"<OrderStock Order:{self.order_id} Stock:{self.stock_id} Qty:{self.quantity}>"
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'POST':
+        data = request.data
+        credentials = json.loads(data)
+        username = credentials['username']
+        password = credentials['password']
+        user = Users.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user, remember=True)
+            return redirect(url_for('dashboard'))
+        else:
+            return "Invalid credentials", 401
+    else:
+        return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def create_account():
+    if request.method == 'POST':
+        data = request.data
+        account = json.loads(data)
+        print(data)
+        print(account)
+        username = account['username']
+        email = account['email']
+        password = account['password']
+        try:
+            new_user = Users(
+                user_id=uuid.uuid4().hex,
+                username=username,
+                email=email,
+                password=generate_password_hash(password, method='scrypt')
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user, remember=True)
+            print('created')
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            print(e)
+            return "Error", 500
+    else:
+        return render_template('create_account.html')
+    
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/')
+@login_required
 def dashboard():
     today = date.today()
     start_of_week = today - timedelta(days=today.weekday())   # Monday of current week
@@ -166,6 +232,7 @@ def dashboard():
 
 
 @app.route('/analytics')
+@login_required
 def analytics():
     # Query all order data
     orders = Orders.query.all()
@@ -231,6 +298,7 @@ def analytics():
 
 
 @app.route('/get-orders')
+@login_required
 def get_orders():
     orders = Orders.query.all()
     order_data = [
@@ -250,6 +318,7 @@ def get_orders():
     return jsonify(order_data)
 
 @app.route('/update-orders', methods = ['PATCH'])
+@login_required
 def update_orders():
     data = request.json
     orders = data['orders']
@@ -260,6 +329,7 @@ def update_orders():
     return ''
 
 @app.route('/orders', methods=['GET', 'POST'])
+@login_required
 def manage_orders():
     if request.method == 'GET':
         stock = Stock.query.all()
@@ -323,6 +393,7 @@ def manage_orders():
 
 
 @app.route("/stock", methods=['GET', 'POST'])
+@login_required
 def manage_stock():
     if request.method == 'POST':
         name = request.form['name']
@@ -358,6 +429,7 @@ def manage_stock():
 
 
 @app.route('/get-stock')
+@login_required
 def get_stock():
     stock = Stock.query.all()
     stock_data = [
@@ -371,6 +443,7 @@ def get_stock():
     return jsonify(stock_data)
 
 @app.route('/update-stock', methods=['PATCH'])
+@login_required
 def update_stock():
     data = request.json
     print(data)
@@ -389,6 +462,7 @@ def update_stock():
     return render_template('stock.html')
 
 @app.route('/stock/<stock_id>', methods=['GET', 'DELETE'])
+@login_required
 def individual_stock(stock_id):
     if request.method == 'GET':
         # Get stock object

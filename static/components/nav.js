@@ -52,7 +52,7 @@ class Nav extends HTMLElement {
                         <a href="/stock">Stock</a>
                         <a href="/orders">Orders</a>
                         <a href="/analytics">Analytics</a>
-                        <a href="/login">Logout</a>
+                        <a href="/logout">Logout</a>
                     </div>
                 </nav>
         `

@@ -10,18 +10,16 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/login.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/global.css') }}">
-    <script src="/static/login.js"></script>
+    <script src="/static/create_account.js"></script>
 </head>
 <body>
-    <header><p>This site is for admin only, click <a href="http://lostidles.com">here</a> to redirect to the main site.</p>
-        <i class="material-icons" style="cursor: pointer" onclick="closePopup()">close</i></header>
     <main>
         <div class="container">
-            <h1>Login</h1>
+            <h1>Create Account</h1>
             <input type="text" placeholder="Username" id="username">
+            <input type="email" placeholder="Email" id="email">
             <input type="password" placeholder="Password" id="password">
             <button type="submit" id="submit" onclick="submit()">Submit</button>
-            <p style="font-size: 0.8rem;">If you do not have an account, please contact your administrator to <a href="signup">create an account</a></p>
         </div>
     </main>
 </body>
