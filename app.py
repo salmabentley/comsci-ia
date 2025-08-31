@@ -348,26 +348,20 @@ def manage_orders():
     elif request.method == 'POST':
         data = request.json
 
-        # Generate or use provided order_id
-        order_id = data['id'] if data['id'] != '' else uuid.uuid4().hex   # short int from UUID
-        # Parse date string if provided, otherwise use today's date
+        order_id = data['id'] if data['id'] != '' else uuid.uuid4().hex   
         date_str = data.get('date')
         order_date = datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else date.today()
-
-        # Create the Order object
         new_order = Orders(
             order_id=order_id,
             order_date=order_date,
             status=False,
-            total=data['total']
+            total=data['total'],
+            user_id=current_user.user_id
         )
-
-        # Create the list of OrderStock entries
         for item in data['order']:
             stock_id = item['stock_id']
             quantity = item['quantity']
 
-            # Optional: check if stock_id exists
             stock = Stock.query.get(stock_id)
             if not stock:
                 return jsonify({"error": f"Stock ID {stock_id} not found"}), 400
@@ -391,6 +385,42 @@ def manage_orders():
 
         return redirect(url_for('manage_orders'))
 
+@app.route('/order/<order_id>', methods=['GET', 'DELETE'])
+@login_required
+def individual_order(order_id):
+    if request.method == 'GET':
+        order = db.session.execute(
+            db.select(Orders).filter_by(order_id=order_id)
+        ).scalar_one_or_none()
+
+        user = db.session.execute(
+            db.select(Users).filter_by(user_id=order.user_id)
+        ).scalar_one_or_none()
+
+        if not order:
+            return "Order not found", 404
+
+        items = [
+            {
+                'id': item.stock.stock_id,
+                'name': item.stock.name,
+                'category': item.stock.category,
+                'price': item.stock.price,
+                'image': item.stock.image,
+                'quantity': item.quantity
+            } for item in order.order_items
+        ]
+
+        order_data = {
+            'order_id': order.order_id,
+            'order_date': order.order_date,
+            'status': order.status,
+            'total': order.total,
+            'user': user.username,
+            'length': len(items)
+        }
+
+        return render_template('individual_order.html', order=order_data, items=items)
 
 @app.route("/stock", methods=['GET', 'POST'])
 @login_required

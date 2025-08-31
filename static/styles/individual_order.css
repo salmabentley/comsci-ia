@@ -1,0 +1,25 @@
+table {
+    width: 100%;
+    /* border: 1px solid white; */
+    height: 80%;
+    background: rgba(116,142,189,0.2);
+    border-radius: 20px;
+    padding: 5%;
+}
+
+td {
+  padding: 16px 0;
+  border-bottom: 1px solid white; /* Separator line */
+  vertical-align: middle;
+}
+
+tr:last-child td {
+    border-bottom: none; /* No border for the last row */
+}
+
+td:first-child {
+    border-right: 1px solid white; /* Separator line */
+  color: #cbd1df; /* Lighter color for the labels */
+  font-weight: bolder;
+  width: 30%;
+}

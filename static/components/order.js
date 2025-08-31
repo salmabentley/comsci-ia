@@ -55,7 +55,7 @@ class Order extends HTMLElement {
                     overflow: hidden;
                 }
             </style>
-            <div class='order'>
+            <div class='order' onclick="window.location.href='/order/${order_id}'">
                 <p>${order_id}</p>
                 <p>$${total}</p>
                 <p>${items}</p>

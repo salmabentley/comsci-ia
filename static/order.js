@@ -258,6 +258,9 @@ function renderOrders() {
     function orderFrontend(order, completed) {
         const div = document.createElement('div');
         div.className = 'order';
+        div.onclick = () => {
+            window.location.href = `/order/${order.order_id}`;
+        }
         const id = document.createElement('p');
         id.textContent = order.order_id;
         const total = document.createElement('p');

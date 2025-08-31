@@ -58,7 +58,7 @@ class Stock extends HTMLElement {
                         text-align: center !important;
                     }
                 </style>
-                <div class="stock-container">
+                <div class="stock-container" onclick="window.location.href='/stock/${stock_id}'>
                     <h4 class="stock-name">${name}</h4>
                     <h4 class="stock-category">${category}</h4>
                     <h4 class="stock-quantity" style="color:${color}">${quantity}</h4>

@@ -1,0 +1,82 @@
+{% extends "boiler.html" %}
+
+{% block title %} Order | {{order.order_id}} {% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/individual_order.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/order.css') }}">
+    <script src="/static/individual_order.js"></script>
+    <script>
+        function redirect(id) {
+            window.location.href = `/stock/${id}`;
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <div id="overlay" onclick="popupClose()"></div>
+    <main>
+        <div id="containers">
+            <div id="left" style="background: none;">
+                <h1>Order Details</h1>
+                <table>
+                    <tr>
+                        <td>Order ID</td>
+                        <td>{{order.order_id}}</td>
+                    </tr>
+                    <tr>
+                        <td>Total</td>
+                        <td>${{order.total}}</td>
+                    </tr>
+                    <tr>
+                        <td>Date</td>
+                        <td>{{order.order_date}}</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        {% if order.status %}
+                            <td style="color: #009E35">
+                                Completed
+                            </td>
+                        {% else %}
+                            <td style="color: #CF0909">
+                                Pending
+                            </td>
+                        {% endif %}
+                        
+                    </tr>
+                    <tr>
+                        <td>User</td>
+                        <td style="display: flex; align-items: center; justify-content: center; gap: 1%">
+                            <i class="material-icons">person     </i>
+                            {{order.user}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div id="right">
+                <div style="
+                    display:flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    ">
+                    <h1>Order Items</h1>
+                </div>
+                <div class="labels">
+                    <h4>Name</h4>
+                    <h4 style="margin-right: 10%;">Category</h4>
+                    <h4>Quantity</h4>
+                    <h4 style="margin-right: 8%;">Level</h4>
+                </div>
+                <div id="pending-order-container">
+                    {% for s in items %}
+                        <div class="order" onclick="redirect('{{s.id}}')"
+                            <p>{{s.name}}</p>
+                            <p style="margin-right: 10%;">{{s.category}}</p>
+                            <p>{{order.length}}</p>
+                            <p style="margin-right: 10%;">{{s.quantity}}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

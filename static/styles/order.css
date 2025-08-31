@@ -47,6 +47,12 @@ h1 {
     margin: 2% 0;
     background: rgba(116,142,189,0.2);
     border-radius: 20px;
+    transition: 0.2s;
+}
+
+.order:hover {
+    cursor:pointer;
+    background: rgba(54, 63, 85, 0.7);
 }
 
 .completed {
