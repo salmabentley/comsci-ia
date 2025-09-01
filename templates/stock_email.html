@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+    <h4>Dear all,</h4>
+    <h5>This notification is to notify everyone that the below item has recently reached a low stock level.</h5>
+    <p>Please create a new stock <strong>soon</strong> to ensure the item does not go out of stock.</p><br>
+    <table>
+        <tr>
+            <td>Item Name</td>
+            <td>Stock Level</td>
+        </tr>
+        <tr>
+            <td>{{stock.name}}</td>
+            <td>{{stock.stock_level}}</td>
+        </tr>
+    </table><br>
+
+    {% if low_stock_items %}
+        <p>The below stock also needs attention, as they have been at a low stock level for a while.</p>
+        <table>
+            <tr>
+                <td>Item Name</td>
+                <td>Stock Level</td>
+            </tr>
+            {% for item in low_stock_items %}
+            <tr>
+                <td>{{item.name}}</td>
+                <td>{{item.stock_level}}</td>
+            </tr>
+            {% endfor %}
+        </table><br>
+    {% endif %}
+    <p>Thank you.</p>
+    <p><i>This is an automated message, please do not reply.</i></p>
+    <p><strong>LOST IDLES Inventory System</strong></p>
+</body>
+</html>

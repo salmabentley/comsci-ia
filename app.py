@@ -8,6 +8,8 @@ import os
 from datetime import date, datetime, timedelta
 import pandas as pd
 from sqlalchemy import func
+from flask_mail import Mail, Message
+from threading import Thread
 
 from werkzeug.utils import secure_filename
 
@@ -17,6 +19,15 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'lostidlesinventory@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ynkx eike hnve xilm'
+app.config['MAIL_DEFAULT_SENDER'] = 'lostidlesinventory@gmail.com'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+mail = Mail(app)
 
 #image checks
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
@@ -317,16 +328,51 @@ def get_orders():
     ]
     return jsonify(order_data)
 
-@app.route('/update-orders', methods = ['PATCH'])
+@app.route('/update-orders', methods=['PATCH'])
 @login_required
 def update_orders():
     data = request.json
-    orders = data['orders']
-    for order in orders:
-        target = db.session.execute(db.select(Orders).filter_by(order_id=order)).scalar_one_or_none()
-        target.status = not target.status
+    order_ids = data.get('orders', [])
+
+    if not order_ids:
+        return 'No orders provided', 400
+    
+    orders_to_update = db.session.execute(
+        db.select(Orders).filter(Orders.order_id.in_(order_ids))
+    ).scalars().all()
+
+    for order_obj in orders_to_update:
+        original_status = order_obj.status
+        new_status = not original_status
+        order_obj.status = new_status
+
+        if not new_status:
+            for order_item in order_obj.order_items:
+                stock_item = order_item.stock
+                if stock_item:
+                    stock_item.stock_level += order_item.quantity
+        elif new_status:
+            for order_item in order_obj.order_items:
+                stock_item = order_item.stock
+                if stock_item:
+                    stock_item.stock_level -= order_item.quantity
+
     db.session.commit()
-    return ''
+    return '', 204
+
+def send_mail_async(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+def send_stock_email(stock):
+    users = Users.query.all()
+    low_stock_items = Stock.query.filter(Stock.stock_level < 15).all()
+    print(low_stock_items)
+    print(stock)
+    recipient_emails = [user.email for user in users]
+    msg = Message(subject=f"Stock Alert: Low Inventory - {stock.name}", recipients=recipient_emails)
+    msg.html = render_template('stock_email.html', stock=stock, low_stock_items=low_stock_items)
+    Thread(target=send_mail_async, args=(app,msg)).start()
 
 @app.route('/orders', methods=['GET', 'POST'])
 @login_required
@@ -365,6 +411,8 @@ def manage_orders():
             stock = Stock.query.get(stock_id)
             if not stock:
                 return jsonify({"error": f"Stock ID {stock_id} not found"}), 400
+            if stock.stock_level-quantity < 15:
+                send_stock_email(stock)
 
             order_item = OrderStock(
                 stock_id=stock_id,

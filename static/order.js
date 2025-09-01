@@ -186,6 +186,7 @@ async function getOrders() {
 function handleClick(button, e, completed) {
 
     e.preventDefault();
+    e.stopPropagation();
     const id = e.target.parentElement.children[0].textContent;
     if (changedOrders.includes(id)) {
         let i = changedOrders.findIndex(order_id=>order_id===id);

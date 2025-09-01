@@ -2,3 +2,5 @@ flask
 sqlalchemy
 flask-sqlalchemy
 pandas
+flask-login
+flask-mail
