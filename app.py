@@ -10,6 +10,9 @@ import pandas as pd
 from sqlalchemy import func
 from flask_mail import Mail, Message
 from threading import Thread
+import numpy as np
+import os
+from model_setup import create_or_load_model, update_model
 
 from werkzeug.utils import secure_filename
 
@@ -37,7 +40,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+model, base_date = create_or_load_model([])
 
 @app.cli.command('stock')
 def show_stock_table():
@@ -52,6 +55,11 @@ def reset_users():
 def reset_users():
     Orders.__table__.drop(db.engine)
     db.create_all()
+
+@app.cli.command('create-model')
+def create_model():
+    orders = db.session.query(Orders).order_by(Orders.order_date).all()
+    model = create_or_load_model(orders)
 
 class Users(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -114,6 +122,44 @@ class OrderStock(db.Model):
 
     def __repr__(self):
         return f"<OrderStock Order:{self.order_id} Stock:{self.stock_id} Qty:{self.quantity}>"
+    
+
+@app.route("/predict-sales", methods=["GET", "POST"])
+def predict_sales():
+    if request.method == "POST":
+
+        data = request.get_json()
+        days_ahead = data.get("days_ahead", [1])
+
+        # Compute offsets relative to base_date
+        today_offset = (date.today() - base_date).days
+        future_offsets = np.array([today_offset + d for d in days_ahead]).reshape(-1, 1)
+
+        predictions = model.predict(future_offsets)
+
+        return jsonify({
+            "days_ahead": days_ahead,
+            "predicted_sales": predictions.tolist()
+        })
+    else:
+        days_ahead = list(range(1, 8))
+        today_offset = (date.today() - base_date).days
+        future_offsets = np.array([today_offset + d for d in days_ahead]).reshape(-1, 1)
+        predictions = model.predict(future_offsets)
+
+        # make dataframe with actual dates + predictions
+        dates = [date.today() + timedelta(days=d) for d in days_ahead]
+        df = pd.DataFrame({
+            "date": dates,
+            "prediction": predictions
+        })
+
+        # send data to template
+        return render_template(
+            "prediction.html",
+            labels=df["date"].astype(str).tolist(),
+            values=df["prediction"].round(2).tolist()
+        )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -425,6 +471,8 @@ def manage_orders():
             db.session.add(new_order)
             db.session.commit()
             print("✅ Order saved successfully")
+            global model, base_date
+            model = update_model(model, base_date, new_order)
         except Exception as e:
             db.session.rollback()
             print(f"❌ Failed to save order: {e}")

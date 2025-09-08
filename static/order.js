@@ -164,8 +164,6 @@ async function submit() {
 
 }
 
-
-
 async function getOrders() {
     await fetch('/get-orders').then(res => res.json())
     .then(data => {

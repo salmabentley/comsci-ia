@@ -4,3 +4,5 @@ flask-sqlalchemy
 pandas
 flask-login
 flask-mail
+scikit-learn
+joblib
