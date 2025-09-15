@@ -8,8 +8,6 @@
     <script src="/static/prediction.js"></script>
 
     <script>
-        // const x_labels = {{ labels | safe }};
-        // const pred_values = {{ values | safe }};
         const weekData = {
             labels: {{ week_labels | safe }},
             values: {{ week_values | safe }},
@@ -40,7 +38,7 @@
         <button class="toggle-button" style="border-radius: 0 10px 10px 0; border-left: 2px solid rgba(106,146,207,0.5)" onclick="switchView('year')">Year</button>
     </div>
         
-    <div style="width: 600px;">
+    <div style="width: 600px; margin-top: 1%;">
         <canvas id="salesChart"></canvas>
     </div>
 </main>

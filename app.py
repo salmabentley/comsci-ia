@@ -12,7 +12,7 @@ from flask_mail import Mail, Message
 from threading import Thread
 import numpy as np
 import os
-from model_setup import create_or_load_model, update_model
+from model_setup import create_or_load_model, update_model, retrain_model_from_orders
 
 from werkzeug.utils import secure_filename
 
@@ -458,6 +458,7 @@ def send_stock_email(stock):
     msg.html = render_template('stock_email.html', stock=stock, low_stock_items=low_stock_items)
     Thread(target=send_mail_async, args=(app,msg)).start()
 
+
 @app.route('/orders', methods=['GET', 'POST'])
 @login_required
 def manage_orders():
@@ -541,7 +542,8 @@ def individual_order(order_id):
                 'category': item.stock.category,
                 'price': item.stock.price,
                 'image': item.stock.image,
-                'quantity': item.quantity
+                'quantity': item.quantity,
+                'level': item.stock.stock_level
             } for item in order.order_items
         ]
 
@@ -555,6 +557,18 @@ def individual_order(order_id):
         }
 
         return render_template('individual_order.html', order=order_data, items=items)
+    else:
+        order = db.session.execute(
+            db.select(Orders).filter_by(order_id=order_id)
+        ).scalar_one_or_none()
+        db.session.delete(order)
+        db.session.commit()
+
+        #reset model
+        orders = db.session.execute(db.select(Orders).order_by(Orders.order_date)).scalars().all()
+        retrain_model_from_orders(orders)
+
+        return ''
 
 @app.route("/stock", methods=['GET', 'POST'])
 @login_required

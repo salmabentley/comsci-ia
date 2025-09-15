@@ -17,7 +17,7 @@
     <main>
         <div id="containers">
             <div id="left" style="background: none;">
-                <h1>Order Details</h1>
+                <h1>Order Details <i class="material-icons" style="color:#CF0909; cursor: pointer" onclick="deleteOrder()">delete</i></h1> 
                 <table>
                     <tr>
                         <td>Order ID</td>
@@ -64,15 +64,15 @@
                     <h4>Name</h4>
                     <h4 style="margin-right: 10%;">Category</h4>
                     <h4>Quantity</h4>
-                    <h4 style="margin-right: 8%;">Level</h4>
+                    <h4 style="margin-right: 8%;">Stock Level</h4>
                 </div>
                 <div id="pending-order-container">
                     {% for s in items %}
                         <div class="order" onclick="redirect('{{s.id}}')"
                             <p>{{s.name}}</p>
                             <p style="margin-right: 10%;">{{s.category}}</p>
-                            <p>{{order.length}}</p>
-                            <p style="margin-right: 10%;">{{s.quantity}}</p>
+                            <p>{{s.quantity}}</p>
+                            <p style="margin-right: 10%;" id="level">{{s.level}}</p>
                         </div>
                     {% endfor %}
                 </div>

@@ -36,5 +36,21 @@ def update_model(model, base_date, order):
     joblib.dump((model, base_date), MODEL_PATH)
     return model
 
+def retrain_model_from_orders(orders):
+    """Retrain model from scratch using all current orders"""
+    model = SGDRegressor()
+    if orders:
+        base_date = orders[0].order_date  # use earliest order as base
+        X = np.array([(o.order_date - base_date).days for o in orders]).reshape(-1, 1)
+        y = np.array([o.total for o in orders])
+        model.partial_fit(X, y)
+    else:
+        base_date = date.today()
+        model.partial_fit([[0]], [0])  # initialize with dummy point
+
+    joblib.dump((model, base_date), MODEL_PATH)
+    return model, base_date
+
+
 
 
