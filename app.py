@@ -142,23 +142,61 @@ def predict_sales():
             "predicted_sales": predictions.tolist()
         })
     else:
-        days_ahead = list(range(1, 8))
+        # days_ahead = list(range(1, 8))
+        # today_offset = (date.today() - base_date).days
+        # future_offsets = np.array([today_offset + d for d in days_ahead]).reshape(-1, 1)
+        # predictions = model.predict(future_offsets)
+
+        # # make dataframe with actual dates + predictions
+        # dates = [date.today() + timedelta(days=d) for d in days_ahead]
+        # df = pd.DataFrame({
+        #     "date": dates,
+        #     "prediction": predictions
+        # })
+
+        # # send data to template
+        # return render_template(
+        #     "prediction.html",
+        #     labels=df["date"].astype(str).tolist(),
+        #     values=df["prediction"].round(2).tolist()
+        # )
         today_offset = (date.today() - base_date).days
-        future_offsets = np.array([today_offset + d for d in days_ahead]).reshape(-1, 1)
-        predictions = model.predict(future_offsets)
 
-        # make dataframe with actual dates + predictions
-        dates = [date.today() + timedelta(days=d) for d in days_ahead]
-        df = pd.DataFrame({
-            "date": dates,
-            "prediction": predictions
-        })
+        # ---- WEEK ----
+        days_week = list(range(1, 8))
+        offsets_week = np.array([today_offset + d for d in days_week]).reshape(-1, 1)
+        pred_week = model.predict(offsets_week)
+        week_dates = [date.today() + timedelta(days=d) for d in days_week]
+        week_labels = [d.strftime("%Y-%m-%d") for d in week_dates]
 
-        # send data to template
+        # ---- MONTH (next 2 months) ----
+        days_month = list(range(1, 61))
+        offsets_month = np.array([today_offset + d for d in days_month]).reshape(-1, 1)
+        pred_month = model.predict(offsets_month)
+        month_dates = [date.today() + timedelta(days=d) for d in days_month]
+
+        df_month = pd.DataFrame({"date": month_dates, "prediction": pred_month})
+        df_month["date"] = pd.to_datetime(df_month["date"])  # convert to datetime
+        df_month["year_month"] = df_month["date"].dt.to_period("M")
+
+        grouped_month = df_month.groupby("year_month")["prediction"].sum().reset_index()
+        month_labels = grouped_month["year_month"].astype(str).tolist()
+        month_values = grouped_month["prediction"].round(2).tolist()
+
+
+        # ---- YEAR ----
+        days_year = list(range(1, 366))
+        offsets_year = np.array([today_offset + d for d in days_year]).reshape(-1, 1)
+        pred_year = model.predict(offsets_year)
+        year_total = pred_year.sum()
+
         return render_template(
             "prediction.html",
-            labels=df["date"].astype(str).tolist(),
-            values=df["prediction"].round(2).tolist()
+            week_labels=week_labels,
+            week_values=pred_week.round(2).tolist(),
+            month_labels=month_labels,
+            month_values=month_values,
+            year_total=round(year_total, 2)
         )
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -204,7 +204,15 @@ button {
     z-index: 5;
     padding: 4% 2%;
     border-radius: 20px;
+}
+
+#popup {
     box-shadow: 1px 1px 20px 10px rgba(15, 1, 53, 0.6);
+}
+
+#popup-stock {
+    box-shadow: 1px 1px 20px 5px #00041a;
+
 }
 
 #popup h1 {
