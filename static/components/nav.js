@@ -1,9 +1,11 @@
 class Nav extends HTMLElement {
+    //define class
     constructor() {
         super();
     }
 
     connectedCallback() {
+        //styling and html structure
         this.innerHTML = `
                 <style>
                     nav {
@@ -31,7 +33,7 @@ class Nav extends HTMLElement {
                         align-items: center;
                         justify-content: center;
                         float: right;
-                        width: 40%;
+                        
                     }
                     nav div a {
                         text-decoration: none;
@@ -42,6 +44,10 @@ class Nav extends HTMLElement {
                     nav div a:hover, nav .active {
                         font-weight: bold;
                         text-shadow: 1px 1px 20px white;
+                    }
+                    #links {
+                        width: fit-content;
+                        margin-right: 10%;
                     }
 
                 </style>
@@ -57,6 +63,7 @@ class Nav extends HTMLElement {
                     </div>
                 </nav>
         `
+        //javascript to highligh current page
         document.addEventListener('DOMContentLoaded', () => {
             const nav = document.getElementById('links');
             const links = nav.getElementsByTagName('a');
@@ -69,5 +76,5 @@ class Nav extends HTMLElement {
         })
     }
 }
-
+//define the custom element
 customElements.define('nav-bar', Nav);

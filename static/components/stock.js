@@ -7,6 +7,7 @@ class Stock extends HTMLElement {
         const name = this.getAttribute("name") || "";
         const category = this.getAttribute("category") || "";
         const quantity = this.getAttribute("quantity") || "";
+        const stock_id = this.getAttribute("stock_id") || "";
         let color;
         if (quantity >= 50) {
             color = "#009E35";
@@ -58,7 +59,7 @@ class Stock extends HTMLElement {
                         text-align: center !important;
                     }
                 </style>
-                <div class="stock-container" onclick="window.location.href='/stock/${stock_id}'>
+                <div class="stock-container" onclick="window.location.href='/stock/${stock_id}'">
                     <h4 class="stock-name">${name}</h4>
                     <h4 class="stock-category">${category}</h4>
                     <h4 class="stock-quantity" style="color:${color}">${quantity}</h4>

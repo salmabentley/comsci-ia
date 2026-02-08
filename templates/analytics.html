@@ -1,4 +1,4 @@
-button{% extends "boiler.html" %}
+{% extends "boiler.html" %}
 
 {% block title %} Analytics {% endblock %}
 
@@ -6,6 +6,7 @@ button{% extends "boiler.html" %}
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
+    // pass data from flask to js here since it is passed from app via jinja
     window.analyticsData = {
         monthLabels: {{ month_data | map(attribute='month') | list | tojson }},
         monthValues: {{ month_data | map(attribute='total') | list | tojson }},

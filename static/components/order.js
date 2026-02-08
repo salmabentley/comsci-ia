@@ -4,7 +4,6 @@ class Order extends HTMLElement {
     }
 
     connectedCallback() {
-        // const orderAttribute = this.getAttribute('order')
         const order = JSON.parse(this.dataset.order)
         const order_id=order.order_id
         console.log(order_id)

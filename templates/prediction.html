@@ -8,6 +8,8 @@
     <script src="/static/prediction.js"></script>
 
     <script>
+    // pass data from flask to js here since it is passed from app via jinja
+
         const weekData = {
             labels: {{ week_labels | safe }},
             values: {{ week_values | safe }},

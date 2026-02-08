@@ -8,6 +8,8 @@
     <script src="{{ url_for('static', filename='components/stock.js') }}" defer></script>
     <script src="{{ url_for('static', filename='components/order.js') }}" defer></script>
     <script>
+    // pass data from flask to js here since it is passed from app via jinja
+
         let sales_data_js = {{sales_data|tojson|safe}};
         let sales_label = sales_data_js.labels;
         let sales_values = sales_data_js.values;
@@ -54,7 +56,7 @@
             <div id="stock-container">
                 {% if stock %}
                     {% for s in stock %}
-                        <stock-card name={{s.name}} category={{s.category}} quantity={{s.stock_level}}></stock-card>
+                        <stock-card name={{s.name}} category={{s.category}} quantity={{s.stock_level}} stock_id={{s.stock_id}}></stock-card>
                     {% endfor %}
                 {% else %}
                     <p>No Low Stock</p>

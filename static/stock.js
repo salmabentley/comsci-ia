@@ -1,34 +1,37 @@
+// the main lists and categories we're using to keep things organised
 let stock = [];
 let filtered_stock = [];
 let categories = ['Accessories', 'Shirts', 'Hoodies & Sweaters', 'Pants', 'Miscellaneous'];
 
-
+// grabbing everything from the database so we have the latest numbers
 async function fetch_stock() {
     await fetch('/get-stock')
-    .then(response => response.json()) //parse body to json
+    .then(response => response.json()) // parse the body to json format
     .then(data => {
         stock = data;
     })
     .catch(error => {
-        console.error('Error:', error)
+        console.error('oops, something went wrong:', error)
     });
     filtered_stock = stock;
     render_stock();
 }
 
-
-
+// this clears the screen and redraws the inventory list
 function render_stock() {
     const target = document.getElementById('stock');
     target.innerHTML = null;
+
+    // if there's nothing there, just let the user know
     if (filtered_stock.length === 0) {
         const noStock = document.createElement('h3');
-        noStock.textContent = 'No stock found';
+        noStock.textContent = 'no stock found';
         target.appendChild(noStock);
         return;
     }
-    filtered_stock.reverse().forEach((s) => {
 
+    // reverse it so the newest stuff shows up first
+    filtered_stock.reverse().forEach((s) => {
         const stockContainer = document.createElement('div')
         stockContainer.className = 'stock-container'
         stockContainer.onclick = stockRedirect;
@@ -45,12 +48,14 @@ function render_stock() {
         const quantity = document.createElement('h4');
         quantity.className = 'stock-quantity';
         quantity.textContent = s.quantity;
+
+        // colour coding the levels so we can see what's running low at a glance
         if (s.quantity >= 50) {
-            quantity.style.color = "#009E35";
+            quantity.style.color = "#009E35"; // looking good
         } else if (s.quantity >= 15) {
-            quantity.style.color = "#CF5C09";
+            quantity.style.color = "#CF5C09"; // getting a bit low
         } else {
-            quantity.style.color = "#CF0909";
+            quantity.style.color = "#CF0909"; // critical level
         }
     
         stockContainer.appendChild(name);
@@ -58,9 +63,9 @@ function render_stock() {
         stockContainer.appendChild(quantity);
         target.appendChild(stockContainer);
     })
-    
 }
 
+// sending a brand new product to the server
 async function addItem(event) {
     event.preventDefault();
 
@@ -69,6 +74,7 @@ async function addItem(event) {
     let price_input = document.getElementById('price').value;
     let quantity_input = document.getElementById('input-value').value;
 
+    // bundle everything up into a form data object (handy for images)
     const fd = new FormData();
     fd.append('name', name_input);
     fd.append('category', category_input);  
@@ -85,11 +91,12 @@ async function addItem(event) {
         method: 'POST',
         body: fd
     }).then(() => {
-        console.log('success');
+        console.log('product added successfully');
     }).catch((err) => {
         console.log(err);
     })
     
+    // update the local list so we don't have to refresh the whole page
     stock.push({
         name: name_input,
         category: category_input,
@@ -97,6 +104,8 @@ async function addItem(event) {
     })
     popupClose();
     render_stock();
+
+    // clean up the form fields for next time
     document.getElementById('name').value = '';
     document.getElementById('category').value = '';
     document.getElementById('image').files[0] = null;
@@ -106,6 +115,7 @@ async function addItem(event) {
 
 let active = null;
 
+// handling the ui when someone wants to add something
 function popupAdd() {
     const overlay = document.getElementById('overlay');
     const buttons = document.getElementById('popupButtons');
@@ -114,39 +124,36 @@ function popupAdd() {
     active = buttons;
     overlay.style.display = 'block'
     buttons.style.display = 'flex';
-    add.textContent = 'Cancel -';
+    add.textContent = 'cancel -';
     add.style.zIndex = 5;
     add.onclick = popupClose;
     add.id = 'cancel';
 }
 
+// tidying up the screen when we close a popup
 function popupClose() {
     const overlay = document.getElementById('overlay');
     const cancel = document.getElementById('cancel');
     if (cancel !== null) {
-        cancel.textContent = "Add +";
+        cancel.textContent = "add +";
         cancel.style.zIndex = 1;
         cancel.onclick = popupAdd;
         cancel.id ='add';
     }
 
-    active.style.display = 'none';
+    if (active) active.style.display = 'none';
     overlay.style.display = 'none';
-
     active = null;
 }
 
+// switching the view to the "new item" form
 function newItem() {
     var popup = document.getElementById("popup");
     active.style.display = 'none';
     active = popup
     popup.style.display = "block";
-    if (cancel !== null) {
-        cancel.textContent = "Add +";
-        cancel.style.zIndex = 1;
-        cancel.onclick = popupAdd;
-        cancel.id ='add';
-    }
+
+    // validation logic to make sure people actually fill in the fields
     const name = document.getElementById('name');
     const category = document.getElementById('category');
     const price = document.getElementById('price')
@@ -190,7 +197,6 @@ function newItem() {
         checkInputs();
     });
     
-
     function checkInputs() {
         if (name_status && category_status && price_status) {
             submit.disabled = false;
@@ -199,8 +205,7 @@ function newItem() {
         }
     }
 
-
-    // quantity logic
+    // syncing the slider and the number box for quantities
     const value = document.getElementById("input-value");
     const input = document.getElementById("quantity-input");
     value.value = input.value;
@@ -212,9 +217,10 @@ function newItem() {
     });
 }
 
+// search functionality to find specific items
 function enter() {
     const input = document.getElementById('search');
-    let query = input.value;
+    let query = input.value.toLowerCase();
     filtered_stock = [];
 
     stock.forEach((s) => {
@@ -224,34 +230,30 @@ function enter() {
     render_stock();
 }
 
+// filtering by category (e.g. only showing shirts)
 function filter_category(event) {
-    event.preventDefault;
     let category = event.target.textContent;
-
     filtered_stock=[];
 
-    if (category == 'None') {filtered_stock = stock}
-    else {
+    if (category == 'None') {
+        filtered_stock = stock
+    } else {
         stock.forEach((s) => {
             if (s.category == category) {filtered_stock.push(s)}
         })
     }
-
     render_stock();
 }
 
-// false is descending true is ascending
+// toggling the sort order for stock levels
 let toggle_level = false;
-
 function filter_level() {
     const arrow = document.getElementById("stock-arrow");
-
     toggle_level = !toggle_level;
 
     if (toggle_level) {
         filtered_stock.sort((a,b) => b.quantity - a.quantity);
         arrow.textContent = "↑";
-
     } else {
         filtered_stock.sort((a,b) => a.quantity - b.quantity);
         arrow.textContent = "↓";
@@ -259,8 +261,8 @@ function filter_level() {
     render_stock();
 }
 
+// alphabetical sorting for item names
 let toggle_name = false;
-
 function filter_name() {
     const arrow = document.getElementById("name-arrow");
     toggle_name = !toggle_name;
@@ -275,9 +277,9 @@ function filter_name() {
     render_stock();
 }
 
+// filling the dropdown so users can pick existing items to restock
 function add_dropdown_stock() {
     const list = document.getElementById("all-stock");
-    const input = document.getElementById("popup-search");
     stock.forEach((s) => {
         let option = document.createElement("option");
         option.value = s.name;
@@ -285,14 +287,14 @@ function add_dropdown_stock() {
     })
 }
 
-
+// adds an item to the "restock list" in the popup
 function push_stock() {
     const input = document.getElementById("popup-search")
     const item = input.value;
-    // const foundItem = stock.find(s=>s.name === item)
+
     if (!stock.some(s => s.name === item)) {
         input.style.border = "2px solid red";   
-        document.getElementById("error-text").textContent = 'Please enter a valid item';
+        document.getElementById("error-text").textContent = 'please enter a valid item';
         input.value = '';
     } else {
         input.style.border = "none";
@@ -304,7 +306,7 @@ function push_stock() {
         name.textContent = item;
         const quantity = document.createElement("input");
         quantity.type = 'number';
-        quantity.placeholder = 'Quantity'
+        quantity.placeholder = 'quantity'
         quantity.min = 1;
         const remove = document.createElement("i");
         remove.className = 'material-icons';
@@ -321,14 +323,14 @@ function push_stock() {
     }
 }
 
+// remove an item from the restock list before saving
 function remove_stock(event) {
     event.preventDefault();
-    const parent = event.srcElement.parentElement;
+    const parent = event.target.parentElement;
     parent.remove();
-
-
 }
 
+// syncing the new stock quantities with the database
 async function updateStock() {
     const collections = document.getElementById("new-stock-container").children;
     const unfilled = [];
@@ -342,70 +344,55 @@ async function updateStock() {
         if (quantity < 0 || quantity == '') {
             unfilled.push(item.querySelector('input'));
         }
-
         return {name, quantity}
     })
 
     if (unfilled.length !== 0) {
-        for (let i =0; i<unfilled.length; i++) {
-            unfilled[i].style.border = '2px solid red';
-        }
-        document.getElementById("error-text").textContent = 'Please enter a valid quantity';
+        unfilled.forEach(input => input.style.border = '2px solid red');
+        document.getElementById("error-text").textContent = 'please enter a valid quantity';
         return;
     } else {
         await fetch('/update-stock', {
             method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(stock_updates)
         }).then(() => {
-            //frontend update
-            for (let i=0; i<stock_updates.length;i++) {
-                const item = stock.find(s=>s.name == stock_updates[i].name);
-                item.quantity += Number(stock_updates[i].quantity);
-
-                document.getElementById("new-stock-container").innerHTML = '';
-            }
-            render_stock()
+            // update the local data so the ui stays in sync
+            stock_updates.forEach(update => {
+                const item = stock.find(s => s.name == update.name);
+                if (item) item.quantity += Number(update.quantity);
+            });
+            document.getElementById("new-stock-container").innerHTML = '';
+            render_stock();
         }).catch((e) => console.log('error: ' + e))
     }
-
-
-
-    console.log(stock_updates);
-    console.log(unfilled);
 }
 
+// opens the restock popup
 function newStock() {
-    // const overlay = document.getElementById("overlay");
     active.style.display = 'none';
     const popup = document.getElementById("popup-stock")
     popup.style.display = 'block';
     active = popup;
-    if (cancel !== null) {
-        cancel.textContent = "Add +";
-        cancel.style.zIndex = 1;
-        cancel.onclick = popupAdd;
-        cancel.id ='add';
-    }
 }
 
+// sends the user to a specific item's detailed page
 function stockRedirect(event) {
-    event.preventDefault;
-    const element = event.target.parentElement;
-
-    window.location.pathname = `/stock/${element.id}`;
+    let element = event.target;
+    // bubble up to find the container with the id
+    while (element && !element.id) {
+        element = element.parentElement;
+    }
+    if (element) window.location.pathname = `/stock/${element.id}`;
 }
 
-
+// getting everything ready as soon as the page finishes loading
 window.onload = async () => {
     await fetch_stock();
     const search = document.getElementById('search');
 
     search.addEventListener('keypress', (e) => {
-        e.preventDefault;
-        enter();
+        if (e.key === 'Enter') enter();
     });
 
     add_dropdown_stock();
